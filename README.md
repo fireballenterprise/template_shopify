@@ -30,7 +30,7 @@ Then in the new repo:
    ```
 
 2. Update `properties.yml` (`repo.local`, `repo.remote`) and `pyproject.toml` (`name`, `description`, URLs)
-3. Create the `development` branch from `main` (after the graft) and set branch protection (PRs required into `development` and `main`)
+3. Create the `development` branch from `main` (after the graft), make it the **default branch** (`gh repo edit <repo> --default-branch development` — GitHub Actions only lists and `workflow_dispatch`es workflows from the default branch, so workflow changes take effect before merging to `main`), and set branch protection (deletion/force-push guards on `development` + `main`)
 4. Add secrets manually (never via AI): `BOT_PRIVATE_KEY`, `SHOPIFY_CLI_THEME_TOKEN`, `SHOPIFY_FLAG_STORE`, `SHOPIFY_THEME_ID_DEV`, `SHOPIFY_THEME_ID_PRD`; variable: `BOT_APP_ID` (`fireball-actions-bot` is installed org-wide)
 5. Remove the weekly `schedule` trigger from `.github/workflows/dawn_sync.yml` (only the template repo auto-syncs; brand repos sync on demand)
 6. Run `./setup.sh`
