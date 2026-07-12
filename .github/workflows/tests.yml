@@ -1,0 +1,14 @@
+---
+name: Tests
+run-name: "Tests (${{ github.head_ref || github.ref_name }})"
+
+# Thin caller — logic lives in fireballenterprise/workflows (floating major tag @1).
+
+on:
+  pull_request:
+    branches:
+      - development
+
+jobs:
+  tests:
+    uses: fireballenterprise/workflows/.github/workflows/tests.yml@1

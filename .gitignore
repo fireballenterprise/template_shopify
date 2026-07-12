@@ -1,0 +1,76 @@
+# Basics
+*#
+*.un~
+*~
+.#*
+.*.sw[a-z]
+/.yardoc
+/_yardoc/
+/coverage/
+/pkg/
+/spec/reports/
+\#*#
+pkg/
+**/tmp/**
+**/wip/**
+**/vendor/**
+**/.bin/**
+**/.vendor/**
+**/.bundle/**
+
+# Linux
+**/.directory
+**/.Trash-*
+
+# Mac OS
+**/.DS_Store
+**/.localized
+
+# Python
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+**/__pycache__/**
+**/*.pyc
+**/.ruff_cache/**
+**/.pytest_cache/**
+
+# Virtual environments
+**/.venv/**
+.venv/
+venv/
+ENV/
+env/
+
+# VSCode
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Windows
+ehthumbs.db
+Thumbs.db
+
+# Mac OS (upstream Dawn)
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Shopify
+.shopify
+node_modules
+*.zip

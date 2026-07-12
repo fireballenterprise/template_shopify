@@ -1,0 +1,13 @@
+---
+name: Release
+run-name: "Release"
+
+# Thin caller — logic lives in fireballenterprise/workflows (floating major tag @1).
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    uses: fireballenterprise/workflows/.github/workflows/release.yml@1
+    secrets: inherit
