@@ -9,5 +9,9 @@ on:
 
 jobs:
   release:
+    # Called workflows can't elevate beyond the caller's grant, and the repo
+    # default is read-only — promote pushes main, publish creates the Release
+    permissions:
+      contents: write
     uses: fireballenterprise/workflows/.github/workflows/release.yml@1
     secrets: inherit
