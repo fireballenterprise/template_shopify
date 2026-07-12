@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv run --no-sync invoke:*)",
+      "Bash(uv run --no-sync python -m modules:*)"
+    ]
+  }
+}

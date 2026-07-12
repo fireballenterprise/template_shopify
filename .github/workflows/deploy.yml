@@ -1,0 +1,27 @@
+---
+name: Deploy
+run-name: "Deploy to ${{ inputs.env || 'dev' }}"
+
+# Thin caller — logic lives in fireballenterprise/workflows (floating major tag @1).
+
+on:
+  push:
+    branches:
+      - development
+  workflow_dispatch:
+    inputs:
+      env:
+        description: 'Environment'
+        required: false
+        type: choice
+        default: dev
+        options:
+          - dev
+          - prd
+
+jobs:
+  deploy:
+    uses: fireballenterprise/workflows/.github/workflows/deploy.yml@1
+    with:
+      env: ${{ inputs.env || 'dev' }}
+    secrets: inherit

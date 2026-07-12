@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "charliermarsh.ruff",
+    "ms-python.python",
+    "shopify.theme-check-vscode",
+    "esbenp.prettier-vscode"
+  ]
+}

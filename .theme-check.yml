@@ -1,0 +1,45 @@
+---
+MatchingTranslations:
+  enabled: false
+TemplateLength:
+  enabled: false
+
+# ignore:
+#   - assets/
+#   - snippets/old-*
+
+AssetPreload:
+  enabled: false
+ImgLazyLoading:
+  enabled: false
+NestedSnippet:
+  enabled: false
+NestedTemplate:
+  enabled: false
+LiquidTag:
+  enabled: false
+PaginationSize:
+  enabled: false
+SchemaJsonFormat:
+  enabled: false
+UnknownFilter:
+  enabled: false
+
+# Pre-existing upstream Shopify/dawn offenses (not introduced by Fireball customizations).
+# Scoped to the exact files so the checks still apply to any file we do customize.
+UndefinedObject:
+  ignore:
+    - layout/password.liquid
+    - layout/theme.liquid
+    - sections/main-product.liquid
+ValidSchemaTranslations:
+  ignore:
+    - sections/featured-product.liquid
+VariableName:
+  ignore:
+    - sections/main-article.liquid
+    - sections/main-list-collections.liquid
+UnusedAssign:
+  ignore:
+    - sections/main-search.liquid
+    - snippets/product-variant-options.liquid
