@@ -12,11 +12,28 @@ gh repo create fireballenterprise/fireball_<brand>_shopify \
 
 Then in the new repo:
 
-1. Update `properties.yml` (`repo.local`, `repo.remote`) and `pyproject.toml` (`name`, `description`, URLs)
-2. Create the `development` branch from `main` and set branch protection (PRs required into `development` and `main`)
-3. Add secrets manually (never via AI): `BOT_PRIVATE_KEY`, `SHOPIFY_CLI_THEME_TOKEN`, `SHOPIFY_FLAG_STORE`, `SHOPIFY_THEME_ID_DEV`, `SHOPIFY_THEME_ID_PRD`; variable: `BOT_APP_ID` (`fireball-actions-bot` is installed org-wide)
-4. Remove the weekly `schedule` trigger from `.github/workflows/dawn_sync.yml` (only the template repo auto-syncs; brand repos sync on demand)
-5. Run `./setup.sh`
+1. Restore Dawn ancestry — template stamping squashes every branch to a single parentless
+   commit, which breaks the merge-based Dawn flows (`dawn_sync` workflow, `invoke dawn.upgrade`):
+
+   ```sh
+   git remote add dawn https://github.com/Shopify/dawn.git
+   git fetch dawn main --no-tags
+   # dawn_vanilla = real upstream history (replaces the squashed snapshot)
+   git push --force origin refs/remotes/dawn/main:refs/heads/dawn_vanilla
+   git fetch origin && git branch -f dawn_vanilla origin/dawn_vanilla
+   # graft the vendored Dawn version into main's ancestry without changing content;
+   # use the tag matching the theme files main currently carries (see config/settings_schema.json)
+   git fetch dawn refs/tags/v15.5.0:refs/tags/dawn-v15.5.0 --no-tags
+   git checkout main
+   git merge dawn-v15.5.0 --allow-unrelated-histories -s ours --no-ff -m "chore: graft Dawn v15.5.0 ancestry into main"
+   git push origin main
+   ```
+
+2. Update `properties.yml` (`repo.local`, `repo.remote`) and `pyproject.toml` (`name`, `description`, URLs)
+3. Create the `development` branch from `main` (after the graft) and set branch protection (PRs required into `development` and `main`)
+4. Add secrets manually (never via AI): `BOT_PRIVATE_KEY`, `SHOPIFY_CLI_THEME_TOKEN`, `SHOPIFY_FLAG_STORE`, `SHOPIFY_THEME_ID_DEV`, `SHOPIFY_THEME_ID_PRD`; variable: `BOT_APP_ID` (`fireball-actions-bot` is installed org-wide)
+5. Remove the weekly `schedule` trigger from `.github/workflows/dawn_sync.yml` (only the template repo auto-syncs; brand repos sync on demand)
+6. Run `./setup.sh`
 
 ## Branches
 

@@ -19,6 +19,10 @@ on:
 
 jobs:
   dawn_sync:
+    # Called workflows can't elevate beyond the caller's grant, and the repo
+    # default is read-only — the sync job pushes to dawn_vanilla
+    permissions:
+      contents: write
     uses: fireballenterprise/workflows/.github/workflows/dawn_sync.yml@1
     with:
       version: ${{ inputs.version || 'latest' }}
