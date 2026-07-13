@@ -2,7 +2,7 @@
 name: Release
 run-name: "Release"
 
-# Thin caller — logic lives in fireballenterprise/workflows (floating major tag @1).
+# Thin caller — logic lives in fireballenterprise/workflows (floating major tag @v1).
 
 on:
   workflow_dispatch:
@@ -13,5 +13,5 @@ jobs:
     # default is read-only — promote pushes main, publish creates the Release
     permissions:
       contents: write
-    uses: fireballenterprise/workflows/.github/workflows/release.yml@1
+    uses: fireballenterprise/workflows/.github/workflows/release.yml@v1
     secrets: inherit
