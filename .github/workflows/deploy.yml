@@ -2,7 +2,7 @@
 name: Deploy
 run-name: "Deploy to ${{ inputs.env || 'dev' }}"
 
-# Thin caller — logic lives in fireballenterprise/workflows (floating major tag @1).
+# Thin caller — logic lives in fireballenterprise/workflows (floating major tag @v1).
 
 on:
   push:
@@ -21,7 +21,7 @@ on:
 
 jobs:
   deploy:
-    uses: fireballenterprise/workflows/.github/workflows/deploy.yml@1
+    uses: fireballenterprise/workflows/.github/workflows/deploy.yml@v1
     with:
       env: ${{ inputs.env || 'dev' }}
     secrets: inherit

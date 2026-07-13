@@ -2,7 +2,7 @@
 name: Dawn Sync
 run-name: "Dawn Sync (dawn_vanilla - ${{ inputs.version || 'latest' }})"
 
-# Thin caller — logic lives in fireballenterprise/workflows (floating major tag @1).
+# Thin caller — logic lives in fireballenterprise/workflows (floating major tag @v1).
 # Syncs the dawn_vanilla branch with upstream Shopify/dawn. Merging dawn_vanilla
 # into development stays a deliberate manual step.
 
@@ -23,6 +23,6 @@ jobs:
     # default is read-only — the sync job pushes to dawn_vanilla
     permissions:
       contents: write
-    uses: fireballenterprise/workflows/.github/workflows/dawn_sync.yml@1
+    uses: fireballenterprise/workflows/.github/workflows/dawn_sync.yml@v1
     with:
       version: ${{ inputs.version || 'latest' }}

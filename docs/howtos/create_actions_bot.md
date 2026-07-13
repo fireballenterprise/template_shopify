@@ -52,7 +52,7 @@ build_version job, `release.yml` version job):
 ```yaml
 - name: Generate bot token
   id: bot-token
-  uses: actions/create-github-app-token@v2
+  uses: actions/create-github-app-token@v3
   with:
     app-id: ${{ vars.BOT_APP_ID }}
     private-key: ${{ secrets.BOT_PRIVATE_KEY }}
