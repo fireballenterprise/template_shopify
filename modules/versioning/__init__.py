@@ -1,1 +1,1 @@
-"""Check pyproject.toml dependencies against the latest published releases."""
+"""Check pyproject.toml dependencies and workflow refs against the latest releases; bump the repo's VERSION file."""

@@ -2,7 +2,7 @@
 
 Before working in this repo, read the relevant files in `.github/instructions/`:
 
-- **Project layout & conventions**: `.github/instructions/project.instructions.md`
+- **Project layout & conventions**: `.github/instructions/index.instructions.md`
 - **Python code**: `.github/instructions/python.instructions.md`
 - **Invoke tasks**: `.github/instructions/tasks.instructions.md`
 - **Shared modules**: `.github/instructions/modules.instructions.md`

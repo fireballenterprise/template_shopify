@@ -21,8 +21,8 @@ dependencies = [
 packages = []
 
 [project.urls]
-homepage = "https://github.com/fireballenterprise/template_shopify_theme"
-repository = "https://github.com/fireballenterprise/template_shopify_theme"
+homepage = "https://github.com/fireballenterprise/template_shopify"
+repository = "https://github.com/fireballenterprise/template_shopify"
 
 [tool.ruff]
 line-length = 120

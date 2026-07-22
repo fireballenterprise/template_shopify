@@ -6,7 +6,7 @@ GitHub template repo for Fireball Enterprise Shopify theme repos. Vendored [Shop
 
 ```sh
 gh repo create fireballenterprise/fireball_<brand>_shopify \
-  --template fireballenterprise/template_shopify_theme \
+  --template fireballenterprise/template_shopify \
   --public --include-all-branches --clone
 ```
 
@@ -70,6 +70,6 @@ Creates a `.venv` with `uv`, installs dependencies, and installs the Shopify CLI
 
 `major.minor.patch-build` in development (e.g. `1.2.0-004`), finalized to `major.minor.patch` on release. NO `v` prefix on release tags. The home page carries the current version as an HTML comment via `snippets/fireball-version.liquid`.
 
-## Skeleton Sync
+## Template Sync
 
-Shared Python tooling (`modules/`, `tasks/`, `.github/`, config files) syncs from [LevonBecker/template_python](https://github.com/LevonBecker/template_python) via `/sync-setup`.
+Shared Python tooling (`modules/`, `tasks/`, `.github/`, config files) syncs from [LevonBecker/template_python](https://github.com/LevonBecker/template_python) via `/template`.

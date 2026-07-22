@@ -7,7 +7,7 @@ applyTo: "tasks/**"
 ## File Location
 - All invoke task modules live under `tasks/`
 - `tasks/__init__.py` builds the root `Collection` — every new task module must be imported and wired there explicitly (no auto-glob loading)
-- Group related tasks by concern: `tasks/claude.py`, `tasks/dawn.py`, `tasks/repo.py`, `tasks/ruff.py`, `tasks/shopify.py`, `tasks/skeleton.py`, `tasks/tests.py`, `tasks/uv.py`, `tasks/version.py`, `tasks/versioning.py`
+- Group related tasks by concern: `tasks/claude.py`, `tasks/dawn.py`, `tasks/repo.py`, `tasks/ruff.py`, `tasks/shopify.py`, `tasks/template.py`, `tasks/tests.py`, `tasks/uv.py`, `tasks/version.py`, `tasks/versioning.py`
 
 ## Collection Conventions
 - Sub-collections usually mirror file names (`tasks/repo.py` → `invoke repo.<task>`), but the

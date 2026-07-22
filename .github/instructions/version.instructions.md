@@ -1,6 +1,6 @@
 ---
 description: "Use when bumping the repo's VERSION file, or editing deploy.yml/release.yml's version jobs. Covers the version.* invoke tasks and the Major.Minor.Patch-Build scheme."
-applyTo: "modules/version/**"
+applyTo: "modules/versioning/project.py"
 ---
 # Version Instructions
 
@@ -22,7 +22,10 @@ Two operations, one per `version.*` invoke task:
   (`1.1.0-001` -> `1.1.0-002`)
 - `version.bump_release` — drop the build suffix (`1.1.0-003` -> `1.1.0`)
 
-See `modules/version/README.md` for full behavior/data-flow details.
+See `modules/versioning/README.md` for full behavior/data-flow details. Kept as its own top-level
+`version.*` invoke collection (not merged under `ver.*`) even though the module now lives in
+`modules/versioning/project.py` — the reusable `fireballenterprise/workflows` deploy.yml/release.yml
+call `invoke version.bump_build`/`version.bump_release` by these exact names.
 
 ## Usage
 ```sh
@@ -95,7 +98,7 @@ job of the *same* run — the triggering commit is already stale by the time `de
 workflow just wrote, not the pre-bump value from whatever originally triggered the run.
 
 ## Module Conventions
-- Same conventions as `modules.instructions.md` generally, except this module exposes
+- Same conventions as `modules.instructions.md` generally, except this file exposes
   `bump_build()`/`bump_release()` (public, no leading `_`) instead of a single `main()` — both are
   equally valid entry points, one per `version.*` invoke task
 - Resolve the repo path via `modules.common.properties.get_repo_root()`, not `get_repo_local()`
