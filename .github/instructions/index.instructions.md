@@ -11,7 +11,7 @@ Shopify Dawn theme fork for Fireball Enterprise (fireballenterprise.com). Uses [
 pyproject.toml    # Dependencies, ruff/pylint config
 invoke.yml        # Invoke config (auto_dash_names: false)
 setup.sh          # Shell-based setup script (uv venv + uv sync)
-properties.yml    # Repo path + remote + skeleton config; points to tmp/.shopify/config.yml for Shopify store/theme IDs
+properties.yml    # Repo path + remote + template config; points to tmp/.shopify/config.yml for Shopify store/theme IDs
 assets/           # Theme JS, CSS, images (synced to Shopify)
 config/           # Theme settings schema (synced to Shopify)
 layout/           # Theme layout files (synced to Shopify)
@@ -20,16 +20,22 @@ sections/         # Theme sections (synced to Shopify)
 snippets/         # Theme snippets (synced to Shopify)
 templates/        # Theme templates (synced to Shopify)
 modules/
-  common/         # cli.py, properties.py, utils.py — shared helpers
+  common/         # cli.py, properties.py, route_utils.py, utils.py — shared helpers
   repo/           # pull.py, push.py, log.py, squash.py, rebase.py — git workflow modules
   shopify/        # pull.py, upgrade.py, env.py — Shopify theme workflow modules
+  template/       # pull.py, push.py, resolve.py, route.py, scope.py — sync shared tooling with the parent template repo for /template
+  versioning/     # libs.py, python.py, workflows.py, upgrade.py, project.py — check pyproject.toml deps, Python version & workflow action refs vs. latest releases; install upgrades; bump the repo's VERSION file
 tasks/
-  __init__.py     # Wires the invoke Collection (repo, shopify, ruff, tests, fix, test)
+  __init__.py     # Wires the invoke Collection (repo, shopify, ruff, template, tests, upgrade, ver, version, fix, test, update)
   repo.py         # repo.pull, repo.push, repo.log, repo.squash, repo.rebase
   shopify.py      # shopify.pull, shopify.upgrade, shopify.fix, shopify.env
   ruff.py         # ruff.fix, ruff.format
+  template.py     # template.pull, template.push_diff, template.push_apply, template.push_create_pr
   tests.py        # tests.actionlint, tests.pylint, tests.rufflint, tests.theme_check, tests.yamllint
-  combos.py       # Top-level aliases: fix, test
+  upgrade.py      # upgrade (default), upgrade.python, upgrade.libs, upgrade.sync — installs; run ver.update first
+  version.py      # version.bump_build, version.bump_release — kept stable for the reusable deploy/release workflows
+  versioning.py   # ver.libs, ver.python, ver.workflows, ver.all, ver.update, ver.upgrade, ver.project_bump_build, ver.project_bump_release
+  combos.py       # Top-level aliases: fix, test, update
 .github/
   instructions/   # Copilot instruction files
   prompts/        # Copilot prompt files (/push, /pull, /test, /fix, /shopify, /pr, etc.)
@@ -89,4 +95,17 @@ uv run --no-sync invoke shopify.pull # Pull live theme from Shopify store → lo
 uv run --no-sync invoke shopify.upgrade # Upgrade dawn_vanilla from upstream Shopify/dawn
 uv run --no-sync invoke shopify.env # Print Shopify CLI env var exports (eval "$(uv run --no-sync invoke shopify.env)")
 shopify theme push         # Push local theme → Shopify store
+uv run --no-sync invoke template.pull           # Resolve the parent template repo's local path for /template
+uv run --no-sync invoke template.push_diff      # Diff this repo's scoped tooling against the parent template repo
+uv run --no-sync invoke template.push_apply     # Copy approved files/deletions to a new branch upstream and push it
+uv run --no-sync invoke template.push_create_pr # Open a PR for that branch against the parent template repo
+uv run --no-sync invoke ver.libs      # Check pyproject.toml deps vs. latest releases, update version locks
+uv run --no-sync invoke ver.python    # Check the pinned Python version vs. latest stable, update config refs
+uv run --no-sync invoke ver.workflows # Check .github/workflows/ action refs vs. latest major versions
+uv run --no-sync invoke ver.update    # Run every version check (libs, python, workflows) — same as top-level `update`
+uv run --no-sync invoke ver.upgrade   # Install the upgrades reviewed via ver.update — same as top-level `upgrade`
+uv run --no-sync invoke upgrade.python # Upgrade Python only (installs, rebuilds .venv)
+uv run --no-sync invoke upgrade.libs   # Upgrade libraries only (uv sync --upgrade)
+uv run --no-sync invoke version.bump_build   # Dev deploy: new minor's first VERSION build, or next build number
+uv run --no-sync invoke version.bump_release # Release: drop the VERSION build suffix
 ```

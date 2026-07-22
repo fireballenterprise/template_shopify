@@ -210,26 +210,26 @@ def get_shopify_theme_id(env: str) -> str:
     raise ValueError(msg)
 
 
-def get_skeleton_local() -> Path:
+def get_template_local() -> Path:
     """
-    Get the local path to the shared skeleton repo (repo_setup_python), used by /sync-setup.
+    Get the local path to the shared template repo (template_python), used by /template.
 
     A relative path is resolved against this repo's root.
 
     Returns:
-        Path to the skeleton repository.
+        Path to the template repository.
     """
     props = get_properties()
-    local = _expand_path(props["skeleton"]["local"])
+    local = _expand_path(props["template"]["local"])
     return local if local.is_absolute() else get_repo_root() / local
 
 
-def get_skeleton_remote() -> str:
+def get_template_remote() -> str:
     """
-    Get the skeleton repo's remote (e.g. "github.com/LevonBecker/repo_setup_python").
+    Get the template repo's remote (e.g. "github.com/LevonBecker/template_python").
 
     Returns:
         Remote repository reference, without a URL scheme.
     """
     props = get_properties()
-    return props["skeleton"]["remote"]
+    return props["template"]["remote"]

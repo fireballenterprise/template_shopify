@@ -15,9 +15,8 @@ Modules provide reusable Python logic consumed by invoke tasks, prompts, and scr
 | `modules/dawn/` | Upstream Shopify/dawn tag listing and upgrade-staging — see `dawn.instructions.md` |
 | `modules/repo/` | Git/PR workflow logic (pull, push, log, squash, rebase, pr) |
 | `modules/shopify/` | Shopify CLI, Dawn upgrade, and CLI env var workflows (pull, deploy, upgrade, env) |
-| `modules/skeleton/` | Locates the shared skeleton repo (repo_setup_python) for `/sync-setup` |
-| `modules/version/` | Bumps the root `VERSION` file for dev deploys and releases — see `version.instructions.md` |
-| `modules/versioning/` | Dependency lock and workflow action-ref checks — see `versioning.instructions.md` |
+| `modules/template/` | Syncs shared, generic tooling with the parent template repo (template_python) for `/template` |
+| `modules/versioning/` | Dependency lock and workflow action-ref checks, and `VERSION`-file bumps (`project.py`) — see `versioning.instructions.md` / `version.instructions.md` |
 
 ## Module Conventions
 - One concern per file; filename matches the concern in snake_case
@@ -54,7 +53,8 @@ def main() -> None:
 | Module | Use When |
 |--------|----------|
 | `cli.py` | Click-like `echo`, `prompt`, `confirm`, `is_tty`, `command`/`option` decorators |
-| `properties.py` | Read `properties.yml` / local Shopify config — `get_repo_local()`, `get_repo_remote()`, `is_ci()`, `get_shopify_store()`, `get_shopify_theme_id_dev()`, `get_shopify_theme_id_prd()`, `get_shopify_theme_id(env)`, `get_shopify_local_theme_token()`, `get_skeleton_local()`, `get_skeleton_remote()` |
+| `properties.py` | Read `properties.yml` / local Shopify config — `get_repo_local()`, `get_repo_remote()`, `is_ci()`, `get_shopify_store()`, `get_shopify_theme_id_dev()`, `get_shopify_theme_id_prd()`, `get_shopify_theme_id(env)`, `get_shopify_local_theme_token()`, `get_template_local()`, `get_template_remote()` |
+| `route_utils.py` | `find_repo_root()`, `build_env()` — used by `modules/template/route.py` |
 | `utils.py` | `success()`, `error()`, `warning()`, `info()`, `create_slug()` |
 
 ## Guidelines

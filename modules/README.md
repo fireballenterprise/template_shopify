@@ -12,9 +12,8 @@ modules/
   dawn/         # upstream Shopify/dawn tag listing and upgrade-staging
   repo/         # pull, push, log, squash, rebase (git workflow)
   shopify/      # pull, upgrade, env (Shopify theme workflow)
-  skeleton/     # locate the shared skeleton repo for /sync-setup
-  version/      # bump the root VERSION file for dev deploys and releases
-  versioning/   # dependency locks, workflow action refs
+  template/     # sync shared, generic tooling with the parent template repo for /template
+  versioning/   # dependency locks, workflow action refs, and VERSION-file bumps (project.py)
 ```
 
 ## Submodules
@@ -26,9 +25,8 @@ modules/
 | [`dawn/`](dawn/README.md) | List upstream Shopify/dawn tags, stage a Dawn upgrade for manual review |
 | [`repo/`](repo/README.md) | Git workflow, session logging, squash, and rebase |
 | [`shopify/`](shopify/README.md) | Shopify CLI theme pull, Dawn upstream upgrade, and CLI env var workflow |
-| [`skeleton/`](skeleton/README.md) | Locate the shared skeleton repo for `/sync-setup` |
-| [`version/`](version/README.md) | Bump the root `VERSION` file for dev deploys and releases |
-| [`versioning/`](versioning/README.md) | Dependency lock and workflow action-ref checks |
+| [`template/`](template/README.md) | Sync shared, generic tooling with the parent template repo for `/template` (pull + push) |
+| [`versioning/`](versioning/README.md) | Dependency lock and workflow action-ref checks; bump the root `VERSION` file for dev deploys and releases |
 
 ## Conventions
 

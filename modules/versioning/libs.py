@@ -5,8 +5,8 @@ Only updates the version locks in pyproject.toml — does NOT install anything.
 Run `uv run --no-sync invoke uv.upgrade` afterward to install the new versions.
 
 Usage:
-    uv run --no-sync python -m modules.versioning.lib
-    uv run --no-sync invoke versioning.libs
+    uv run --no-sync python -m modules.versioning.libs
+    uv run --no-sync invoke ver.libs
 """
 
 from __future__ import annotations

@@ -1,6 +1,6 @@
 from invoke import task
 
-from . import ruff, shopify, tests
+from . import ruff, shopify, tests, versioning
 
 
 @task
@@ -19,3 +19,9 @@ def test(context):
     tests.rufflint(context)
     tests.theme_check(context)
     tests.yamllint(context)
+
+
+@task
+def update(context, dry_run=False, yes=False):
+    """Run every version check (libs, python, workflows) — top-level alias for ver.update"""
+    versioning.update(context, dry_run=dry_run, yes=yes)

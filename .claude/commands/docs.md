@@ -13,7 +13,7 @@ until the user has reviewed the checklist and approved specific items.
 
 ## 1. `.github/instructions/` accuracy
 Compare each file under `.github/instructions/` against what it documents (see the file table in
-`project.instructions.md`). Flag:
+`index.instructions.md`). Flag:
 - Tasks in `tasks/*.py` or modules in `modules/` that are new, renamed, or removed since the last
   update to `tasks.instructions.md` / `modules.instructions.md`
 - Conventions introduced by the current diff (branch conventions, workflow jobs, dependency
