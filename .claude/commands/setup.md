@@ -1,5 +1,5 @@
 ---
-description: Run initial project setup. Creates the uv virtual environment, installs dependencies, and configures the Shopify CLI environment.
+description: Run initial project setup. Creates the uv virtual environment, installs dependencies, creates/stamps properties.yml, and configures the Shopify CLI environment.
 subtask: false
 agent: general
 slash_command: /setup
