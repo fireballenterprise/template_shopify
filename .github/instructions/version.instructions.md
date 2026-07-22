@@ -16,21 +16,21 @@ Scheme: `Major.Minor.Patch[-Build]`
 - A build suffix (e.g. `1.1.0-003`) — build `003` toward `1.1.0`, already deployed to the
   `development` Shopify theme, not yet released to `main`/production.
 
-Two operations, one per `version.*` invoke task:
-- `version.bump_build` — no build suffix yet -> bump the minor and start build `001`
+Two operations, one per `ver.*` invoke task:
+- `ver.project_bump_build` — no build suffix yet -> bump the minor and start build `001`
   (`1.0.0` -> `1.1.0-001`); build suffix present -> increment the build number only
   (`1.1.0-001` -> `1.1.0-002`)
-- `version.bump_release` — drop the build suffix (`1.1.0-003` -> `1.1.0`)
+- `ver.project_bump_release` — drop the build suffix (`1.1.0-003` -> `1.1.0`)
 
-See `modules/versioning/README.md` for full behavior/data-flow details. Kept as its own top-level
-`version.*` invoke collection (not merged under `ver.*`) even though the module now lives in
-`modules/versioning/project.py` — the reusable `fireballenterprise/workflows` deploy.yml/release.yml
-call `invoke version.bump_build`/`version.bump_release` by these exact names.
+See `modules/versioning/README.md` for full behavior/data-flow details. These live under the
+`ver.*` namespace alongside `ver.libs`/`ver.python`/`ver.workflows` (same module,
+`modules/versioning/project.py`) — the reusable `fireballenterprise/workflows` deploy.yml/release.yml
+call `invoke ver.project_bump_build`/`ver.project_bump_release` by these exact names as of `@v2`.
 
 ## Usage
 ```sh
-uv run --no-sync invoke version.bump_build        # dev deploy: new minor's first build, or next build number
-uv run --no-sync invoke version.bump_release     # release: drop the build suffix
+uv run --no-sync invoke ver.project_bump_build        # dev deploy: new minor's first build, or next build number
+uv run --no-sync invoke ver.project_bump_release     # release: drop the build suffix
 ```
 Both only rewrite `VERSION` and restamp `snippets/fireball-version.liquid` — they don't commit,
 branch, or push. `deploy.yml`/`release.yml` handle all git/PR plumbing themselves (same spirit as
@@ -38,13 +38,13 @@ the promote (`release.yml`) and `upgrade.yml` inline `git` steps), so the module
 operation, easy to reason about and lint independently of git state.
 
 ## Relationship to Other Workflows
-- **`deploy.yml`** — its first job runs `version.bump_build`, then opens and immediately merges a
+- **`deploy.yml`** — its first job runs `ver.project_bump_build`, then opens and immediately merges a
   PR carrying the `VERSION` change into `development` (see "Why a PR, Not a Direct Push" below),
   but only when deploying to the **dev** theme (`(inputs.env || 'dev') == 'dev'`). It's skipped
   when `deploy.yml` is called with `env: prd` (from `release.yml`, after its `promote` job) since
   `release.yml` already finalized `VERSION` for that release — bumping it again here would
   double-bump.
-- **`release.yml`** — its first job runs `version.bump_release` against `development`, then opens
+- **`release.yml`** — its first job runs `ver.project_bump_release` against `development`, then opens
   and merges the same kind of PR with the finalized version (no build suffix), then feeds that
   value through its `promote` job (which merges the now-finalized `VERSION` into `main`), `deploy.yml`
   (`env: prd`), and the GitHub Release step, which tags `main` as `v<version>`. There's no manual

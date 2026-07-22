@@ -18,11 +18,8 @@ uv run --no-sync invoke update                    # same as above — top-level 
 uv run --no-sync invoke ver.libs --dry-run        # preview only, never writes
 uv run --no-sync invoke ver.libs --yes            # skip the confirmation prompt
 
-uv run --no-sync invoke version.bump_build        # dev deploy: new minor's first build, or next build number
-uv run --no-sync invoke version.bump_release      # release: drop the build suffix
-
-uv run --no-sync invoke ver.project_bump_build    # same as version.bump_build, under the ver.* namespace
-uv run --no-sync invoke ver.project_bump_release  # same as version.bump_release, under the ver.* namespace
+uv run --no-sync invoke ver.project_bump_build    # dev deploy: new minor's first build, or next build number
+uv run --no-sync invoke ver.project_bump_release  # release: drop the build suffix
 
 uv run --no-sync invoke ver.upgrade    # install the upgrades reviewed via ver.update — same as top-level `upgrade`
 uv run --no-sync invoke upgrade        # same as above — top-level alias, also `upgrade.python`/`upgrade.libs`/`upgrade.sync`
@@ -31,11 +28,11 @@ uv run --no-sync invoke upgrade        # same as above — top-level alias, also
 `/update` is the slash command (`.github/prompts/update.prompt.md`) backing the `ver.*` checks
 above; `/upgrade` (`.github/prompts/upgrade.prompt.md`) backs the installs.
 
-`version.bump_build`/`version.bump_release` keep their own `version.*` task names (not only
-`ver.project_bump_*`) — the reusable `fireballenterprise/workflows` deploy.yml/release.yml call
-them by these exact names, so renaming or removing them would break deploys. `ver.project_bump_*`
-is an additional alias wrapping the same `project.py` functions, kept for consistency with
-`template_python`'s `tasks/versioning.py`.
+`ver.project_bump_build`/`ver.project_bump_release` are the only task names for these — the
+reusable `fireballenterprise/workflows` deploy.yml/release.yml call them by these exact names (as
+of `@v2`), so renaming or removing them would break deploys. (An earlier `@v1` had these as their
+own top-level `version.*` task names in a since-removed `tasks/version.py`; both the workflow refs
+and this module have since moved to `ver.project_bump_*` only.)
 
 `--dry-run` and `--yes` work the same way on `ver.python`, `ver.workflows`, and `ver.update`.
 
@@ -109,7 +106,7 @@ private `_get_installed_packages`/`_get_outdated_packages`/`_load_pyproject`/`_f
 helpers (aliased on import) to decide whether libraries need upgrading at all before doing
 anything. `upgrade.sync` (no check step) just runs `uv sync --upgrade` directly.
 
-## `project.py` — `version.bump_build` / `version.bump_release` (aliased as `ver.project_bump_build` / `ver.project_bump_release`)
+## `project.py` — `ver.project_bump_build` / `ver.project_bump_release`
 
 Bumps the root `VERSION` file (`Major.Minor.Patch[-Build]`) for development deploys, and finalizes
 it for release. Does not commit or push — that's handled by the calling GitHub Actions workflow
@@ -119,10 +116,10 @@ scheme and workflow relationship.
 ## Conventions
 
 - `libs.py`/`python.py`/`workflows.py` each expose a module-level `main()` entry point;
-  `project.py` exposes `bump_build()`/`bump_release()` instead — both equally valid entry points.
-  `version.bump_build`/`version.bump_release` stay as their own top-level collection (not only
-  `ver.*`), so the external `fireballenterprise/workflows` reusable workflow's
-  `invoke version.bump_build` / `version.bump_release` calls keep working unchanged
+  `project.py` exposes `bump_build()`/`bump_release()` instead — both equally valid entry points,
+  wired as `ver.project_bump_build`/`ver.project_bump_release` so the external
+  `fireballenterprise/workflows` reusable workflow's `invoke ver.project_bump_build` /
+  `ver.project_bump_release` calls keep working unchanged
 - `libs.py`/`python.py`/`workflows.py` use `@click.command()` with `--dry-run`/`--yes` options
 - Shell out via `subprocess.run(..., cwd=repo_path)` — never `shell=True`
 - Use `modules.common.utils` (`success`/`error`/`warning`/`info`) for all console output
