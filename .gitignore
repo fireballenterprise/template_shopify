@@ -18,6 +18,9 @@ pkg/
 **/.vendor/**
 **/.bundle/**
 
+# Machine-specific config (local repo/template paths) — copy properties.yml.example to get started
+/properties.yml
+
 # Linux
 **/.directory
 **/.Trash-*
