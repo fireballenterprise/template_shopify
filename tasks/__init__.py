@@ -22,7 +22,6 @@ from . import (  # noqa: E402  # pylint: disable=wrong-import-position
     tests,
     upgrade,
     uv,
-    version,
     versioning,
 )
 
@@ -40,7 +39,6 @@ namespace.add_collection(template, name="template")
 namespace.add_collection(tests, name="tests")
 namespace.add_collection(upgrade, name="upgrade")
 namespace.add_collection(uv, name="uv")
-namespace.add_collection(version, name="version")
 namespace.add_collection(versioning, name="ver")
 
 namespace.add_task(combos.fix, name="fix")
