@@ -14,6 +14,7 @@ Modules provide reusable Python logic consumed by invoke tasks, prompts, and scr
 | `modules/common/` | Helpers tightly coupled to invoke tasks (`cli`, `properties`, `utils`) |
 | `modules/dawn/` | Upstream Shopify/dawn tag listing and upgrade-staging — see `dawn.instructions.md` |
 | `modules/repo/` | Git/PR workflow logic (pull, push, log, squash, rebase, pr) |
+| `modules/setup/` | One-time/idempotent repo bootstrapping (`properties.yml` creation), called by `setup.sh` |
 | `modules/shopify/` | Shopify CLI, Dawn upgrade, and CLI env var workflows (pull, deploy, upgrade, env) |
 | `modules/template/` | Syncs shared, generic tooling with the parent template repo (template_python) for `/template` |
 | `modules/versioning/` | Dependency lock and workflow action-ref checks, and `VERSION`-file bumps (`project.py`) — see `versioning.instructions.md` / `version.instructions.md` |
@@ -62,3 +63,10 @@ def main() -> None:
 - Use `modules.common.utils` for all console output; never bare `print()` in `modules/` code
 - Keep functions focused and single-purpose; extract private helpers instead of writing long functions
 - Add type hints to all function signatures
+- A `main()` wrapped in `@cli.command()` (e.g. `modules/setup/properties.py`) falls back to
+  parsing real CLI args via argparse when called with zero args/kwargs — fine when invoked
+  standalone (`python -m modules.x.y`), but calling it in-process from an invoke task with no
+  kwargs makes it parse the *invoke* process's own `sys.argv` instead and fail on the leftover
+  task-name argument. Tasks with options (`ver.libs`, etc.) sidestep this by always passing kwargs
+  (`module.main(dry_run=dry_run, ...)`); a task with no options to pass (`setup.properties`) must
+  shell out instead (`context.run("python -m modules.setup.properties")`) to get a clean argv

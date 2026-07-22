@@ -142,7 +142,7 @@ multi-phase logic with confirmation gates between steps that a single invoke cal
 version, workflow action refs) — it installs nothing. `/upgrade` performs the actual installs
 (new Python version, `.venv` rebuild, `uv sync --upgrade`) after `/update`'s changes are reviewed.
 
-`version.bump_build`/`version.bump_release` are invoked directly by the reusable
+`ver.project_bump_build`/`ver.project_bump_release` are invoked directly by the reusable
 `fireballenterprise/workflows` deploy/release workflows (not via a slash command) — see
 `version.instructions.md`.
 

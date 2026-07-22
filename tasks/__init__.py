@@ -16,12 +16,12 @@ from . import (  # noqa: E402  # pylint: disable=wrong-import-position
     debug,
     repo,
     ruff,
+    setup,
     shopify,
     template,
     tests,
     upgrade,
     uv,
-    version,
     versioning,
 )
 
@@ -33,12 +33,12 @@ namespace.add_collection(dawn, name="dawn")
 namespace.add_collection(debug, name="debug")
 namespace.add_collection(repo, name="repo")
 namespace.add_collection(ruff, name="ruff")
+namespace.add_collection(setup, name="setup")
 namespace.add_collection(shopify, name="shopify")
 namespace.add_collection(template, name="template")
 namespace.add_collection(tests, name="tests")
 namespace.add_collection(upgrade, name="upgrade")
 namespace.add_collection(uv, name="uv")
-namespace.add_collection(version, name="version")
 namespace.add_collection(versioning, name="ver")
 
 namespace.add_task(combos.fix, name="fix")

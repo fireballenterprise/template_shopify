@@ -29,7 +29,7 @@ Then in the new repo:
    git push origin main
    ```
 
-2. Update `properties.yml` (`repo.local`, `repo.remote`) and `pyproject.toml` (`name`, `description`, URLs)
+2. Update `pyproject.toml` (`name`, `description`, URLs) — `properties.yml` (`repo.local`, `repo.remote`) is created/stamped automatically by `./setup.sh` in step 6
 3. Create the `development` branch from `main` (after the graft), make it the **default branch** (`gh repo edit <repo> --default-branch development` — GitHub Actions only lists and `workflow_dispatch`es workflows from the default branch, so workflow changes take effect before merging to `main`), and set branch protection (deletion/force-push guards on `development` + `main`)
 4. Add secrets manually (never via AI): `BOT_PRIVATE_KEY`, `SHOPIFY_CLI_THEME_TOKEN`, `SHOPIFY_FLAG_STORE`, `SHOPIFY_THEME_ID_DEV`, `SHOPIFY_THEME_ID_PRD`; variable: `BOT_APP_ID` (`fireball-actions-bot` is installed org-wide)
 5. Remove the weekly `schedule` trigger from `.github/workflows/dawn_sync.yml` (only the template repo auto-syncs; brand repos sync on demand)
@@ -43,7 +43,7 @@ Then in the new repo:
 
 ## Workflows
 
-Thin callers only — logic lives in `fireballenterprise/workflows`, referenced by floating major tag `@1` (no `v` prefix; exact tags like `1.0.0` also exist).
+Thin callers only — logic lives in `fireballenterprise/workflows`, referenced by floating major tag `@v2` (exact tags like `v2.0.0` also exist).
 
 | Caller | Trigger | Purpose |
 |--------|---------|---------|
@@ -64,7 +64,7 @@ Thin callers only — logic lives in `fireballenterprise/workflows`, referenced 
 ./setup.sh
 ```
 
-Creates a `.venv` with `uv`, installs dependencies, and installs the Shopify CLI.
+Creates a `.venv` with `uv`, installs dependencies, installs the Shopify CLI, and creates/stamps `properties.yml` for this machine.
 
 ## Versioning
 
