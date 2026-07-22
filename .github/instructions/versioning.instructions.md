@@ -6,7 +6,7 @@ applyTo: "modules/versioning/**"
 
 ## Purpose
 Three checks against external sources of truth, plus the repo's `VERSION`-file bump (`project.py`,
-also reachable as `version.bump_build`/`version.bump_release` — see `version.instructions.md`) and
+also reachable as `ver.project_bump_build`/`ver.project_bump_release` — see `version.instructions.md`) and
 the installs that follow (`upgrade.py`):
 - `ver.libs` — compares `pyproject.toml`'s `[project.dependencies]` against the latest
   published package releases (via `uv pip list [--outdated]`), and rewrites just the version locks

@@ -9,8 +9,8 @@ Every write also restamps `snippets/fireball-version.liquid`, the theme snippet 
 the version as an HTML comment on the home page, so the deployed theme reports its version.
 
 Usage:
-    uv run --no-sync invoke version.bump_build      # dev deploy: new minor, or next build number
-    uv run --no-sync invoke version.bump_release    # release: drop the build suffix
+    uv run --no-sync invoke ver.project_bump_build      # dev deploy: new minor, or next build number
+    uv run --no-sync invoke ver.project_bump_release    # release: drop the build suffix
 """
 
 from __future__ import annotations
