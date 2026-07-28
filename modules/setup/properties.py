@@ -1,23 +1,17 @@
 """
 Stamp this machine's repo path (and git remote, if any) into properties.yml.
 
-Idempotent and safe to re-run any time — e.g. after moving the repo on disk,
-renaming it, or forking it to a new remote. Run via `inv setup.properties`
-(called automatically by setup.sh, but you can re-run it directly whenever
-the repo's location or remote changes).
+Idempotent and safe to re-run any time — e.g. after moving the repo on disk, renaming it, or
+forking it to a new remote. Run via `inv setup.properties` (called automatically by setup.sh).
 
-properties.yml is gitignored (it holds machine-specific local paths) and
-created fresh from the built-in template below on first run. Every run after
-that only rewrites specific keys in place — repo.local, repo.remote, and
-template.* — by targeting those specific keys (not a placeholder token — a
-token would only be replaceable once, breaking re-runs after a move/rename).
-Every other line, including comments, is left exactly as-is, so hand edits
-survive.
+properties.yml is gitignored (machine-specific local paths) and created fresh from the built-in
+template on first run. Every run after that only rewrites repo.local, repo.remote, and template.*
+in place — everything else, including comments, is left exactly as-is, so hand edits survive.
 
-template.* (this repo's parent template repo, used by /template) is
-auto-detected from GitHub's generated-from link when possible, with an
-interactive prompt as fallback — and is only ever written while it still
-holds the built-in placeholder, so a hand-configured parent is never
+template.* (this repo's parent template repo, used by /template) is auto-detected — first against
+a small known-family map (template_ai_vault, template_shopify → template_python), then via
+GitHub's generated-from link, with an interactive prompt as final fallback — and is only ever
+written while it still holds the built-in placeholder, so a hand-configured parent is never
 clobbered.
 """
 
@@ -32,23 +26,16 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 _PROPERTIES_FILE = _REPO_ROOT / "properties.yml"
 
 _TEMPLATE = """---
-# template_shopify Properties
+# Repository Properties
 # Central configuration for all scripts and automation.
-#
-# `inv setup.properties` (run automatically by setup.sh, and safe to re-run any time — e.g. after
-# moving this repo, renaming it, or forking it to a new remote) creates this file from a built-in
-# template on first run and re-stamps repo.local / repo.remote / template.* on every run.
+# Created by /setup or ./setup.sh or ./setup.ps1
 
+# This Repository's Local and Remote Paths
 repo:
   local: "$HOME/path/to/this/repo"
   remote: "github.com/<your-username>/<your-repo-name>"
 
-shopify:
-  local_config: "tmp/.shopify/config.yml"
-
-# This repo's parent template repo — where /template pulls shared tooling updates (modules/,
-# tasks/, .github/, .claude/, etc.) from, and pushes generic improvements to as PRs. Optional —
-# leave the placeholders if this repo doesn't sync with a template.
+# Repository Template Parent Repository
 template:
   local: "$HOME/path/to/your/template/repo"
   remote: "github.com/<your-username>/<your-template-repo>"
@@ -57,6 +44,23 @@ template:
 
 _TEMPLATE_LOCAL_PLACEHOLDER = "$HOME/path/to/your/template/repo"
 _TEMPLATE_REMOTE_PLACEHOLDER = "github.com/<your-username>/<your-template-repo>"
+
+# Known direct children of this repo (template_python) — domain templates that fork straight from
+# the root. Checked first, before GitHub's generated-from API, since it's instant and needs no
+# network/gh dependency. Not exhaustive — leaf project repos (children of a domain template, e.g.
+# fireball_enterprise_shopify under template_shopify) aren't and can't be listed here; those still
+# rely on the API/prompt fallback below.
+_KNOWN_TEMPLATE_PARENTS: dict[str, str] = {
+    "template_ai_vault": "github.com/LevonBecker/template_python",
+    "template_shopify": "github.com/LevonBecker/template_python",
+}
+
+
+def _repo_name(repo_remote: str | None) -> str:
+    """Return this repo's own short name, preferring the git remote over the local folder name."""
+    if repo_remote:
+        return repo_remote.rstrip("/").rsplit("/", 1)[-1]
+    return _REPO_ROOT.name
 
 
 def _detect_repo_local() -> str:
@@ -88,7 +92,15 @@ def _detect_repo_remote() -> str | None:
 
 
 def _detect_template_remote(repo_remote: str | None) -> str | None:
-    """Return this repo's parent template as 'github.com/owner/name' via GitHub's generated-from link."""
+    """Return this repo's parent template as 'github.com/owner/name'.
+
+    Checks the known template-family map first (instant, no `gh` dependency), then falls back to
+    GitHub's generated-from link.
+    """
+    known = _KNOWN_TEMPLATE_PARENTS.get(_repo_name(repo_remote))
+    if known:
+        return known
+
     if not repo_remote or not repo_remote.startswith("github.com/"):
         return None
     try:
@@ -148,6 +160,27 @@ def _replace_scalar(lines: list[str], section: str, key: str, value: str, *, quo
     return False
 
 
+def _strip_legacy_section(lines: list[str], section: str) -> list[str]:
+    """Remove a stale top-level `section:` block (and everything indented under it), if present.
+
+    Self-heals properties.yml files stamped by an older version of this template that included a
+    section since removed from the schema (e.g. `screenshots:`).
+    """
+    out: list[str] = []
+    skipping = False
+    for line in lines:
+        if line.rstrip("\n") == f"{section}:":
+            skipping = True
+            continue
+        if skipping:
+            if line.strip() and not line[0].isspace():
+                skipping = False
+            else:
+                continue
+        out.append(line)
+    return out
+
+
 def _stamp_template_parent(lines: list[str], repo_local: str, repo_remote: str | None) -> None:
     """Fill in template.* (the /template parent) while it still holds the placeholder.
 
@@ -160,7 +193,7 @@ def _stamp_template_parent(lines: list[str], repo_local: str, repo_remote: str |
 
     remote = _detect_template_remote(repo_remote)
     if remote:
-        info(f"Detected parent template repo (GitHub generated-from): {remote}")
+        info(f"Detected parent template repo: {remote}")
     elif cli.confirm("Sync shared tooling with a parent template repo via /template?", default=False):
         remote = cli.prompt("Parent template remote (e.g. github.com/<user>/<template-repo>)")
 
@@ -187,6 +220,7 @@ def main() -> None:
     repo_remote = _detect_repo_remote()
 
     lines = _PROPERTIES_FILE.read_text().splitlines(keepends=True)
+    lines = _strip_legacy_section(lines, "screenshots")
     _replace_scalar(lines, "repo", "local", repo_local)
     if repo_remote:
         _replace_scalar(lines, "repo", "remote", repo_remote)

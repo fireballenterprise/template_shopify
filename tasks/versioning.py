@@ -52,7 +52,7 @@ def upgrade(_context, yes=False):
 
 @task
 def project_bump_build(_context):
-    """Advance VERSION for a dev deploy (new minor's first build, or next build number)"""
+    """Advance VERSION for a dev build (new minor's first build, or next build number)"""
     project_module.bump_build()
 
 

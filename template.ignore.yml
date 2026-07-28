@@ -1,0 +1,50 @@
+---
+# Paths (relative to repo root) that `/template pull` must never overwrite, and `/template push`
+# must never send upstream. This is the ONLY exclusion mechanism besides `.gitignore` -- both
+# directions read `git ls-files`, which already skips whatever this repo's own `.gitignore`
+# covers (caches, build artifacts, .venv/, etc.), so nothing else is hardcoded in the Python code.
+#
+# Entries match a file/dir prefix or a glob pattern, e.g. "topics/", "active_topic.yml", "*.local.*".
+# List this file's own name below so it protects itself -- otherwise a pull could overwrite your
+# local customizations with the parent's copy.
+exclude:
+  - template.ignore.yml
+  - properties.yml
+  - properties.yml.example
+  - README.md
+  - LICENSE
+  - uv.lock
+  - VERSION
+  - pyproject.toml
+  - .claude/settings.local.json
+  - cspell.config.yaml
+  - .vscode/**
+  - addons/**
+  # Shopify theme content -- template_python has no notion of a Shopify theme, so none of
+  # this has an upstream equivalent to sync.
+  - assets/
+  - config/
+  - layout/
+  - locales/
+  - sections/
+  - snippets/
+  - templates/
+  - docs/
+  - .theme-check.yml
+  - .prettierrc.json
+  - release-notes.md
+  # Shopify automation's
+  - .claude/commands/dawn.md
+  - .claude/commands/shopify.md
+  - .github/instructions/dawn.instructions.md
+  - .github/instructions/fireball.instructions.md
+  - .github/instructions/shopify.instructions.md
+  - .github/prompts/dawn.prompts.md
+  - .github/prompts/shopify.prompts.md
+  - .github/workflows/dawn_sync.yml
+  - .github/workflows/deploy.yml
+  - .github/workflows/publish_release.yml
+  - .github/workflows/release.yml
+  - .github/workflows/tests.yml
+  - tasks/dawn.py
+  - tasks/shopify.py

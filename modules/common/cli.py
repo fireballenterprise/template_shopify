@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import inspect
 import pathlib
 import sys
 from collections.abc import Callable
@@ -215,6 +216,19 @@ def _add_option(parser: argparse.ArgumentParser, spec: _OptionSpec) -> None:
     parser.add_argument(*spec.flags, **kwargs)
 
 
+def _invoked_as_script() -> bool:
+    """True only when reached via this module's own `if __name__ == "__main__": main()`.
+
+    Distinguishes `python -m modules.x.y [--flags]` (where `sys.argv[1:]` are genuine CLI args
+    for this command) from an in-process call like `some_module.main()` from an invoke task
+    (where `sys.argv` still holds the invoke process's own argv, e.g. `['repo.pr_diff']` — parsing
+    that as this command's own args raises a spurious "unrecognized arguments" error).
+    """
+    frame = inspect.currentframe()
+    caller = frame.f_back.f_back if frame and frame.f_back else None
+    return caller is not None and caller.f_globals.get("__name__") == "__main__"
+
+
 def command() -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """Decorator compatible subset of click.command."""
 
@@ -229,7 +243,8 @@ def command() -> Callable[[Callable[..., Any]], Callable[..., Any]]:
             for spec in specs:
                 _add_option(parser, spec)
 
-            parsed = parser.parse_args()
+            argv = sys.argv[1:] if _invoked_as_script() else []
+            parsed = parser.parse_args(argv)
             return func(**vars(parsed))
 
         wrapper.__cli_options__ = specs

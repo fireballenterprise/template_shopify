@@ -1,0 +1,168 @@
+"""Shopify store/theme config — not part of the shared template_python repo."""
+
+import os
+import re
+from functools import lru_cache
+from pathlib import Path
+from typing import Any
+
+import yaml
+
+from .properties import get_properties, get_repo_root
+from .utils import info
+
+
+def is_ci() -> bool:
+    """Return True when running inside GitHub Actions."""
+    return os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
+
+
+def _expand_path(value: str) -> Path:
+    """Expand ~ and environment variables (e.g. $HOME) in a properties.yml path value."""
+    return Path(os.path.expandvars(os.path.expanduser(value)))
+
+
+def ensure_shopify_section() -> None:
+    """Add the `shopify:` section to properties.yml if it's missing.
+
+    `modules/setup/properties.py`'s built-in template mirrors the shared template_python repo
+    wholesale on every `/template pull`, so it has no Shopify concept and thus no `shopify:`
+    section. Called as an extra `inv setup.properties` step (after the generic stamping) to
+    restore it, the same way Shopify-specific config reading lives here instead of in
+    `properties.py` — see `shopify.instructions.md`.
+    """
+    props_file = get_repo_root() / "properties.yml"
+    if not props_file.is_file():
+        return
+
+    text = props_file.read_text(encoding="utf-8")
+    if re.search(r"(?m)^shopify:", text):
+        return
+
+    block = 'shopify:\n  local_config: "tmp/.shopify/config.yml"\n\n'
+    match = re.search(r"(?m)^(?:#.*\n)*template:", text)
+    if match:
+        text = text[: match.start()] + block + text[match.start() :]
+    else:
+        text = text.rstrip("\n") + "\n\n" + block.rstrip("\n") + "\n"
+    props_file.write_text(text, encoding="utf-8")
+    info("properties.yml: added shopify.local_config section")
+
+
+def get_shopify_local_config_path() -> Path:
+    """
+    Get the local path to the gitignored Shopify config file.
+
+    A relative path is resolved against this repo's root.
+
+    Returns:
+        Path to the local Shopify config file.
+    """
+    props = get_properties()
+    local = _expand_path(props["shopify"]["local_config"])
+    return local if local.is_absolute() else get_repo_root() / local
+
+
+@lru_cache(maxsize=1)
+def get_shopify_local_config() -> dict[str, Any]:
+    """
+    Load the gitignored Shopify config file (token path, store, theme IDs), cached.
+
+    Kept out of properties.yml (and out of git) since it identifies the store
+    and both theme IDs.
+
+    Returns:
+        Dictionary with the local Shopify config.
+
+    Raises:
+        FileNotFoundError: If the config file does not exist.
+    """
+    config_file = get_shopify_local_config_path()
+    if not config_file.is_file():
+        msg = (
+            f"Local Shopify config not found: {config_file}\n"
+            "Create it with 'local_theme_token', 'store', 'theme_id_dev', and 'theme_id_prd' keys."
+        )
+        raise FileNotFoundError(msg)
+
+    with config_file.open(encoding="utf-8") as f:
+        return yaml.safe_load(f)
+
+
+def get_shopify_local_theme_token() -> Path:
+    """
+    Get the local path to the Shopify Theme Access token file.
+
+    A relative path is resolved against this repo's root.
+
+    Returns:
+        Path to the token file.
+    """
+    local = _expand_path(get_shopify_local_config()["local_theme_token"])
+    return local if local.is_absolute() else get_repo_root() / local
+
+
+def get_shopify_store() -> str:
+    """
+    Get the Shopify store domain.
+
+    Reads from the SHOPIFY_FLAG_STORE env var in CI (set from a secret), or from the
+    local Shopify config file otherwise.
+
+    Returns:
+        Shopify store domain (e.g. "mystore.myshopify.com").
+    """
+    if is_ci():
+        return os.environ["SHOPIFY_FLAG_STORE"]
+    return str(get_shopify_local_config()["store"])
+
+
+def get_shopify_theme_id_dev() -> str:
+    """
+    Get the Shopify development theme ID.
+
+    Reads from the SHOPIFY_THEME_ID_DEV env var in CI (set from a secret), or from the
+    local Shopify config file otherwise.
+
+    Returns:
+        Development theme ID.
+    """
+    if is_ci():
+        return os.environ["SHOPIFY_THEME_ID_DEV"]
+    return str(get_shopify_local_config()["theme_id_dev"])
+
+
+def get_shopify_theme_id_prd() -> str:
+    """
+    Get the Shopify production (live) theme ID.
+
+    Reads from the SHOPIFY_THEME_ID_PRD env var in CI (set from a secret), or from the
+    local Shopify config file otherwise.
+
+    Returns:
+        Production theme ID.
+    """
+    if is_ci():
+        return os.environ["SHOPIFY_THEME_ID_PRD"]
+    return str(get_shopify_local_config()["theme_id_prd"])
+
+
+def get_shopify_theme_id(env: str) -> str:
+    """
+    Get the Shopify theme ID for an environment shortcut.
+
+    Args:
+        env: Either "dev" or "prd".
+
+    Returns:
+        The resolved theme ID.
+
+    Raises:
+        ValueError: If env is not "dev" or "prd".
+    """
+    if env == "dev":
+        return get_shopify_theme_id_dev()
+    if env == "prd":
+        return get_shopify_theme_id_prd()
+    msg = f"Unknown Shopify environment {env!r} — expected 'dev' or 'prd'."
+    raise ValueError(msg)

@@ -1,80 +1,43 @@
-# Repo Modules
+# Repo Module
 
-Git workflow logic invoked by the `repo.*` invoke tasks (see [tasks/repo.py](../../tasks/repo.py)).
+Git workflow and Pull Request automation — pull, push, rebase, squash, session logs, and PR
+creation. Shared logic used by both `invoke repo.*` tasks and the `/repo`, `/push`, `/pull`,
+`/rebase`, `/squash`, `/pr`, `/pr-notes` slash commands.
 
-| Module | Purpose |
-|--------|---------|
-| `pull.py` | Pull from git remote (stash → `pull --rebase` → restore stash) |
-| `push.py` | Push to git remote (`invoke fix` → `invoke test` → commit → push) |
-| `log.py` | Save a timestamped session log markdown file to `logs/` |
-| `squash.py` | Anchored squash of all commits to root, with optional force push |
-| `rebase.py` | Rebase onto the remote default branch, with optional squash-first and interactive conflict resolution |
-| `pr.py` | Detect the PR base branch (`development`/`main`), print commit/diff context, save PR notes to `tmp/pull_requests/`, and open the PR via `gh` (targets this fork explicitly with `--repo`, since `gh` otherwise defaults to the upstream `Shopify/dawn` parent) |
+## Usage
 
-## Conventions
-
-- Every module exposes a module-level `main()` entry point (also runnable via `python -m modules.repo.<name>`) — `pr.py` additionally exposes `save_notes()` and `create_pr()` for its two other invoke tasks
-- Shell out to `git` via `subprocess.run(..., cwd=repo_path)` — never `shell=True`
-- Use `modules.common.cli` for output/prompts and `modules.common.utils` for success/error/warning messages
-- Resolve the repository path via `modules.common.properties.get_repo_local()`
-
-**Workflow:**
-1. Prompt: *"Run squash before rebasing? [y/N]"*
-   - If yes → delegates to `Repo::Squash.run` and returns
-2. `git fetch --prune`
-3. Auto-detect base branch (`origin/main` → `origin/master` → `origin/HEAD`)
-4. `git rebase <base>`
-
-**When to Use:**
-- To bring a branch up to date with main before merging
-- After squashing — rebase to apply cleanly on top of remote
-
-**Invoke task:** `uv run --no-sync invoke repo.rebase`
-**Prompt:** `/rebase`
-
----
-
-## `log.py` — session logging
-
-Save a markdown session log to `logs/` with a timestamped filename.
-
-**Workflow:**
-1. Prompt for a log title (if not provided)
-2. Generate filename: `YYYYMMDDHHMM_slug.md`
-3. Write log template to `logs/` (creates directory if needed)
-
-**Log Template:**
-```markdown
-# <title>
-
-Date: <ISO 8601 timestamp>
-
-## Summary
-## Code Changes
-## Validation
-## Notes
+```sh
+uv run --no-sync invoke repo.pull          # Stash → pull --rebase → restore
+uv run --no-sync invoke repo.push          # Fix → test → commit → push (handles new feature branches too)
+uv run --no-sync invoke repo.log           # Save a session log to logs/
+uv run --no-sync invoke repo.squash        # Anchored squash of all commits to root + optional force push
+uv run --no-sync invoke repo.rebase        # Rebase onto remote default branch (optionally squash first)
+uv run --no-sync invoke repo.pr_diff       # Print current branch's commit log/diff vs. its base branch
+uv run --no-sync invoke repo.pr_notes_save # Save PR notes to tmp/pull_requests/ (--content=...)
+uv run --no-sync invoke repo.pr_create     # Open a GitHub PR via gh (--title=... --content=...)
 ```
 
-**When to Use:**
-- End of a coding session — record what was done
-- After a significant change — document the work
+`/repo <subcommand> [args]` (`modules/repo/route.py`) is the AI-facing entrypoint for the same
+functions — `/repo push`, `/repo pull`, `/repo pr_diff`, `/repo pr_notes`, `/repo pr_create`,
+`/repo rebase`, `/repo squash`. `/push` and `/pull` are direct aliases for `/repo push`/`/repo pull`.
 
-**Invoke task:** `uv run --no-sync invoke repo.log`
+## Files
 
----
-
-## `pr.py` — PR notes and creation via `gh`
-
-Detects the base branch (`development` or `main`), gathers commit/diff context, and opens a PR
-with the GitHub CLI. Requires `gh` to be installed and authenticated (not a pip dependency).
-
-**When to Use:**
-- `/pr-notes` — draft (and optionally save) a PR description without pushing or opening a PR
-- `/punch-it-chewy` — push, then draft notes and open the PR in one step
-
-**Invoke tasks:** `uv run --no-sync invoke repo.pr_diff`, `repo.pr_notes_save`, `repo.pr_create`
-**Prompts:** `/pr-notes`, `/punch-it-chewy`
-
-Note: this project's hand-crafted `/pr` command uses the `create_pull_request` tool directly
-instead of this module — it's kept separate since it already handles this repo's fork-specific
-targeting (base repo `fireballenterprise/shopify_dawn_theme`, base branch `development`).
+- `push.py` — stash → pull (falls back to `--rebase` on divergence, or pushes with `-u` if the
+  branch has no upstream yet) → restore stash → commit → push. Runs `invoke fix`/`invoke test`
+  first and stops if tests don't pass. Used by `/push` and `invoke repo.push`
+- `pull.py` — stash → `git pull --rebase` → restore stash. Used by `/pull` and `invoke repo.pull`
+- `log.py` — saves a timestamped session log markdown file to `logs/`
+- `squash.py` — anchored squash of every commit down to the repo's root commit into one, with an
+  auto-generated bulleted message; optional `--force-with-lease` push
+- `rebase.py` — rebases the current branch onto the remote default branch (`origin/main` or
+  `origin/master`), optionally squashing first; handles stashing and interactive conflict
+  resolution if restoring the stash conflicts
+- `pr_diff.py` — detects the current branch's base/default branch and prints its commit log + diff
+  vs. that base, for use when drafting a PR description. Exposes `PROTECTED_BRANCHES` and
+  `current_branch()`/`detect_base_branch()`, shared by `push.py`, `pr_notes.py`, and `pr_create.py`
+- `pr_notes.py` — saves drafted PR notes markdown to `tmp/pull_requests/`
+- `pr_create.py` — opens a GitHub Pull Request for the current branch via `gh pr create`; reports
+  the existing PR's URL instead of erroring if one is already open
+- `route.py` — `/repo <subcommand> [args]` argument dispatch, used by the AI-facing `/repo` command
+- `README.md` — this file
