@@ -8,11 +8,8 @@ from ..common import cli
 from ..common.properties import get_repo_local
 from ..common.utils import error, info, success, warning
 
-# Import check functions (libs.py keeps these private/underscore-prefixed; alias them here)
-from .libs import _find_updates as find_updates
-from .libs import _get_installed_packages as get_installed_packages
-from .libs import _get_outdated_packages as get_outdated_packages
-from .libs import _load_pyproject as load_pyproject
+# Import check functions
+from .libs import get_declared_dependency_names, get_outdated_packages, load_pyproject
 from .python import get_current_python_version, get_latest_stable_python
 
 
@@ -69,17 +66,23 @@ def check_python_needs_upgrade(repo_path: Path) -> tuple[bool, str, str]:
 
 
 def check_libs_need_upgrade(repo_path: Path) -> tuple[bool, int]:
-    """Check if libraries need upgrading.
+    """Check if any declared dependency has an installed version older than what's available.
+
+    Compares *installed* package versions against `uv pip list --outdated`, not pyproject.toml's
+    specifier string against the latest version (that's `find_updates`, used by `ver.libs` to
+    detect config drift) — `/update` may already have bumped the specifier before the matching
+    `uv sync --upgrade` ever ran, which would make a specifier-vs-latest check report nothing to
+    do even though `.venv`/`uv.lock` are still on the old version.
 
     Returns:
         (needs_upgrade, count_of_updates)
     """
-    installed_packages = get_installed_packages(repo_path)
-    outdated_packages = get_outdated_packages(repo_path)
+    outdated_packages = get_outdated_packages()
     toml_doc, _ = load_pyproject(repo_path)
-    lib_updates = find_updates(toml_doc, outdated_packages, installed_packages)
+    declared = get_declared_dependency_names(toml_doc)
 
-    return (len(lib_updates) > 0, len(lib_updates))
+    relevant_outdated = [pkg for pkg in outdated_packages if pkg["name"].lower() in declared]
+    return (len(relevant_outdated) > 0, len(relevant_outdated))
 
 
 @cli.command()

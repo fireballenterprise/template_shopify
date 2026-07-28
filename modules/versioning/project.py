@@ -5,11 +5,8 @@ VERSION tracks `Major.Minor.Patch[-Build]`. No build suffix means a released ver
 (e.g. `1.0.0`); a build suffix (e.g. `1.1.0-003`) means builds are in progress toward that
 Major.Minor.Patch but it hasn't shipped yet. See `version.instructions.md` for the full rules.
 
-Every write also restamps `snippets/fireball-version.liquid`, the theme snippet that renders
-the version as an HTML comment on the home page, so the deployed theme reports its version.
-
 Usage:
-    uv run --no-sync invoke ver.project_bump_build      # dev deploy: new minor, or next build number
+    uv run --no-sync invoke ver.project_bump_build      # dev build: new minor, or next build number
     uv run --no-sync invoke ver.project_bump_release    # release: drop the build suffix
 """
 
@@ -22,18 +19,12 @@ from ..common.properties import get_repo_root
 from ..common.utils import error, success
 
 _VERSION_PATTERN = re.compile(r"^(\d+)\.(\d+)\.(\d+)(?:-(\d+))?$")
-_SNIPPET_STAMP_PATTERN = re.compile(r"(?<=<!-- Fireball Dawn Theme v)\d+\.\d+\.\d+(?:-\d+)?(?= -->)")
 _BUILD_WIDTH = 3
 
 
 def _version_file(repo_root: Path) -> Path:
     """Path to the repo's VERSION file."""
     return repo_root / "VERSION"
-
-
-def _snippet_file(repo_root: Path) -> Path:
-    """Path to the theme snippet that stamps the version into rendered pages."""
-    return repo_root / "snippets" / "fireball-version.liquid"
 
 
 def _read(repo_root: Path) -> tuple[int, int, int, int | None]:
@@ -52,16 +43,8 @@ def _read(repo_root: Path) -> tuple[int, int, int, int | None]:
 
 
 def _write(repo_root: Path, version: str) -> None:
-    """Overwrite VERSION with a new value and restamp the theme's version snippet."""
+    """Overwrite VERSION with a new value."""
     _version_file(repo_root).write_text(f"{version}\n", encoding="utf-8")
-
-    snippet_file = _snippet_file(repo_root)
-    if not snippet_file.is_file():
-        error(f"Version snippet not found at {snippet_file}")
-    stamped, count = _SNIPPET_STAMP_PATTERN.subn(version, snippet_file.read_text(encoding="utf-8"))
-    if count != 1:
-        error(f"Expected exactly one version stamp in {snippet_file}, found {count}")
-    snippet_file.write_text(stamped, encoding="utf-8")
 
 
 def bump_build() -> str:

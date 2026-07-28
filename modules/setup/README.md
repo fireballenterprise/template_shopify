@@ -1,5 +1,4 @@
 # Setup Module
-
 One-time and idempotent repo bootstrapping helpers, called by `setup.sh`.
 
 ## Commands
@@ -15,7 +14,8 @@ place afterward rather than treating the whole file as disposable:
 1. If `properties.yml` doesn't exist, creates it from a built-in template (`_TEMPLATE` in the module).
 2. Detects this repo's actual path on disk and its git `origin` remote (if any).
 3. Rewrites only `repo.local` and `repo.remote` in place, targeting those specific keys by name —
-   every comment, `shopify.local_config`, and the rest of the file's formatting survives untouched.
+   every comment and the rest of the file's formatting survives untouched. Also strips any stale
+   sections left over from an older template version (e.g. a legacy `screenshots:` block).
 
 Safe to re-run any time: `uv run --no-sync invoke setup.properties`. Re-run it after moving the repo
 on disk, renaming it, or pointing it at a new fork — it just re-stamps the same fields with freshly

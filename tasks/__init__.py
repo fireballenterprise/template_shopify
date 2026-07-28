@@ -10,7 +10,6 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from . import (  # noqa: E402  # pylint: disable=wrong-import-position
-    claude,
     combos,
     dawn,
     debug,
@@ -28,7 +27,6 @@ from . import (  # noqa: E402  # pylint: disable=wrong-import-position
 namespace = Collection()
 namespace.configure({"auto_dash_names": False})
 
-namespace.add_collection(claude, name="claude")
 namespace.add_collection(dawn, name="dawn")
 namespace.add_collection(debug, name="debug")
 namespace.add_collection(repo, name="repo")

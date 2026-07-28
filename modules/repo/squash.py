@@ -72,6 +72,7 @@ def _force_push(repo_path: Path) -> None:
     success("Force push complete!")
 
 
+@click.command()
 def main() -> None:
     """Anchored squash of all commits to root, with optional force push."""
     repo_path = get_repo_local()
@@ -123,4 +124,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    main()  # pylint: disable=no-value-for-parameter

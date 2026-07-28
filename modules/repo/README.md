@@ -1,80 +1,161 @@
-# Repo Modules
+# Repo Manager Agent
 
-Git workflow logic invoked by the `repo.*` invoke tasks (see [tasks/repo.py](../../tasks/repo.py)).
+The repo module handles repository-level operations including git synchronization.
 
-| Module | Purpose |
-|--------|---------|
-| `pull.py` | Pull from git remote (stash → `pull --rebase` → restore stash) |
-| `push.py` | Push to git remote (`invoke fix` → `invoke test` → commit → push) |
-| `log.py` | Save a timestamped session log markdown file to `logs/` |
-| `squash.py` | Anchored squash of all commits to root, with optional force push |
-| `rebase.py` | Rebase onto the remote default branch, with optional squash-first and interactive conflict resolution |
-| `pr.py` | Detect the PR base branch (`development`/`main`), print commit/diff context, save PR notes to `tmp/pull_requests/`, and open the PR via `gh` (targets this fork explicitly with `--repo`, since `gh` otherwise defaults to the upstream `Shopify/dawn` parent) |
+## Features
 
-## Conventions
+- **Repository Push/Pull**: Full git operations
+- **Automated Commits**: Timestamp-based commit messages
+- **Error Handling**: Graceful handling of push/pull failures
 
-- Every module exposes a module-level `main()` entry point (also runnable via `python -m modules.repo.<name>`) — `pr.py` additionally exposes `save_notes()` and `create_pr()` for its two other invoke tasks
-- Shell out to `git` via `subprocess.run(..., cwd=repo_path)` — never `shell=True`
-- Use `modules.common.cli` for output/prompts and `modules.common.utils` for success/error/warning messages
-- Resolve the repository path via `modules.common.properties.get_repo_local()`
+## Commands
+
+### `/repo push` (alias: `/push`)
+Push changes to git remote from any location.
 
 **Workflow:**
-1. Prompt: *"Run squash before rebasing? [y/N]"*
-   - If yes → delegates to `Repo::Squash.run` and returns
-2. `git fetch --prune`
-3. Auto-detect base branch (`origin/main` → `origin/master` → `origin/HEAD`)
-4. `git rebase <base>`
+1. **Navigate to repository root** - Automatically changes to repo directory
+2. **Git pull** - Fetch and merge latest changes from remote
+3. **Check for local changes** - Identify uncommitted work with `git status`
+4. **Stage all changes** - Run `git add .` if changes detected
+5. **Commit with timestamp** - Create commit: `Push repository: Automated commit YYYY-MM-DD HH:MM:SS`
+6. **Push to remote** - Upload changes to GitHub
+7. **Confirm completion** - Show status summary
+
+**Features:**
+- ✅ Works from any directory in the repository
+- ✅ Automatic git operations (pull, commit, push)
+- ✅ Timestamp-based commit messages
+- ✅ Error handling for each push step
 
 **When to Use:**
-- To bring a branch up to date with main before merging
-- After squashing — rebase to apply cleanly on top of remote
+- **End of session** - Push all work before closing
+- **After making changes** - Save work to remote
+- **Regular backups** - Keep work synchronized and safe
+- **After major changes** - Backup important work immediately
 
-**Invoke task:** `uv run --no-sync invoke repo.rebase`
-**Prompt:** `/rebase`
+**Error Handling:**
+- Git pull failure: Stops execution
+- Git push failure: Stops execution with error
 
----
+**Module:** `modules.repo.push` (via `/repo push`)
 
-## `log.py` — session logging
-
-Save a markdown session log to `logs/` with a timestamped filename.
+### `/repo pull` (alias: `/pull`)
+Pull updates from git remote from any location.
 
 **Workflow:**
-1. Prompt for a log title (if not provided)
-2. Generate filename: `YYYYMMDDHHMM_slug.md`
-3. Write log template to `logs/` (creates directory if needed)
+1. **Check working directory** - Stash local changes if the working tree is dirty
+2. **Git pull** - Fetch and merge latest changes from remote (rebase, to handle diverged history)
+3. **Restore stash** - Restore stashed changes, if any were made
 
-**Log Template:**
-```markdown
-# <title>
+**Features:**
+- ✅ Works from any directory in the repository
+- ✅ Stashes and restores local changes automatically around the pull
+- ✅ Rebases onto latest remote history instead of merge-committing
 
-Date: <ISO 8601 timestamp>
+**When to Use:**
+- **Start of session** - Get latest from git remote
+- **After making changes on another device** - Pull updates to local
+- **Before starting work** - Ensure you have latest version
 
-## Summary
-## Code Changes
-## Validation
-## Notes
+**Error Handling:**
+- Stash failure: Stops execution
+- Git pull failure: Stops execution; restores the stash first if one was made
+
+**Module:** `modules.repo.pull` (via `/repo pull`)
+
+## Branch Maintenance
+
+### `/rebase`
+Rebase the current branch onto the remote default branch (`origin/main` or `origin/master`).
+Optionally offers to run `/squash` first. Handles stashing local changes and interactive conflict
+resolution (ours/theirs/manual) if restoring the stash conflicts.
+
+**Module:** `modules.repo.rebase` (via `/rebase`)
+
+### `/squash`
+Anchored squash of every commit down to the repository's root commit into one commit, with an
+auto-generated bulleted message. Prompts to review the message, confirm the (irreversible) local
+squash, and optionally force-push (`--force-with-lease`).
+
+**Module:** `modules.repo.squash` (via `/squash`)
+
+## Git Integration
+
+### Push/Pull Operations
+
+**Pull Sequence:**
+```bash
+git status --porcelain  # Check for uncommitted changes, stash if dirty
+git pull --rebase       # Fetch and rebase onto remote
+git stash pop           # Restore stashed changes, if any
 ```
 
-**When to Use:**
-- End of a coding session — record what was done
-- After a significant change — document the work
+**Push Sequence:**
+```bash
+git pull                # Fetch and merge from remote
+git status --porcelain  # Check for changes
+git add .               # Stage all changes
+git commit -m "Push repository: Automated commit 2025-12-11 01:30:45"
+git push                # Upload to remote
+```
 
-**Invoke task:** `uv run --no-sync invoke repo.log`
+**Commit Message Format:**
+```
+Push repository: Automated commit YYYY-MM-DD HH:MM:SS
+```
 
----
+## Configuration
 
-## `pr.py` — PR notes and creation via `gh`
+Default settings in `config.yml`:
+- `repo_path`: "${repo_local}"
 
-Detects the base branch (`development` or `main`), gathers commit/diff context, and opens a PR
-with the GitHub CLI. Requires `gh` to be installed and authenticated (not a pip dependency).
+## Permissions Required
 
-**When to Use:**
-- `/pr-notes` — draft (and optionally save) a PR description without pushing or opening a PR
-- `/punch-it-chewy` — push, then draft notes and open the PR in one step
+- `git_pull` - Pull from remote repository
+- `git_push` - Push to remote repository
+- `git_commit` - Create commits
+- `git_status` - Check repository status
+- `directory_access` - Navigate repository directories
+- `bash_execute` - Run shell scripts
 
-**Invoke tasks:** `uv run --no-sync invoke repo.pr_diff`, `repo.pr_notes_save`, `repo.pr_create`
-**Prompts:** `/pr-notes`, `/punch-it-chewy`
+## Dependencies
 
-Note: this project's hand-crafted `/pr` command uses the `create_pull_request` tool directly
-instead of this module — it's kept separate since it already handles this repo's fork-specific
-targeting (base repo `fireballenterprise/shopify_dawn_theme`, base branch `development`).
+- `git` - Version control operations
+
+## Best Practices
+
+1. **Pull/Push Regularly**: Run `/repo pull` at start, `/repo push` at end of sessions
+2. **Check Status**: Review git status before push if concerned about changes
+3. **Network Aware**: Git operations require network connectivity
+4. **Backup Important**: Always push before major changes or deletions
+
+## Workflow Examples
+
+**Cross-Device Workflow:**
+```
+Device A:
+1. /repo pull                # Pull latest before starting
+   [work on content]
+2. /repo push                # Push changes to remote
+
+Device B (later):
+1. /repo pull                # Pull changes from Device A
+```
+
+## Related Commands
+
+- `/repo push` - Push all commits to remote (alias: `/push`)
+- `/repo pull` - Pull latest changes from remote (alias: `/pull`)
+
+## Files
+
+- `push.py` - Push to git (used by `/repo push`, alias `/push`)
+- `pull.py` - Pull from git (used by `/repo pull`, alias `/pull`)
+- `config.yml` - Agent configuration
+- `README.md` - This file
+
+## Command Aliases
+
+- `/push` → Push to git
+- `/pull` → Pull from git

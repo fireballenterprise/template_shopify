@@ -13,7 +13,7 @@ applyTo: "*.md"
 
 ## README Conventions
 - Lead with a short one-sentence project description
-- Include: Prerequisites, Setup, Invoke Tasks, AI Prompts, and Modules sections
+- Include: Setup, Project Structure, Invoke Tasks, AI Prompts, and Modules sections
 - Show invoke commands in fenced `sh` code blocks (`uv run --no-sync invoke ...`)
 - Keep it concise — link out rather than duplicating content
 
@@ -23,7 +23,8 @@ applyTo: "*.md"
 - Use `# noqa: RULE` or `# pylint: disable=rule-name` with an explanation comment on the same or preceding line
 
 ## Instruction Files (`.github/instructions/`)
-- One file per concern (python, style, tasks, modules, tests, shopify, docs, prompts, project)
+- One file per concern — see `.github/instructions/logic.instructions.md`'s "Documentation"
+  section for the current, canonical list (not repeated here to avoid a second place going stale)
 - Always include a `description` in YAML frontmatter using the "Use when..." pattern
 - Use `applyTo` glob only when the instruction is relevant to a specific file type or directory
 - Keep instructions actionable and example-driven — prefer short code blocks over prose

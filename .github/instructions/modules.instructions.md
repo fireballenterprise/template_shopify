@@ -1,5 +1,5 @@
 ---
-description: "Use when creating or editing shared Python library modules used by invoke tasks or prompts. Covers modules/ structure, module patterns, and helper conventions."
+description: "Use when creating or editing shared Python modules used by invoke tasks or prompts. Covers modules/ structure, module patterns, and helper conventions."
 applyTo: "modules/**/*.py"
 ---
 # Modules Instructions
@@ -10,22 +10,19 @@ Modules provide reusable Python logic consumed by invoke tasks, prompts, and scr
 ## Locations
 | Path | Purpose |
 |------|---------|
-| `modules/claude/` | Syncs `.claude/commands/` from `.github/prompts/` source of truth |
 | `modules/common/` | Helpers tightly coupled to invoke tasks (`cli`, `properties`, `utils`) |
-| `modules/dawn/` | Upstream Shopify/dawn tag listing and upgrade-staging — see `dawn.instructions.md` |
+| `modules/hermes/` | Syncs `~/.hermes/` config + SKILL.md (`sync.py`, not an invoke task) |
 | `modules/repo/` | Git/PR workflow logic (pull, push, log, squash, rebase, pr) |
-| `modules/setup/` | One-time/idempotent repo bootstrapping (`properties.yml` creation), called by `setup.sh` |
-| `modules/shopify/` | Shopify CLI, Dawn upgrade, and CLI env var workflows (pull, deploy, upgrade, env) |
-| `modules/template/` | Syncs shared, generic tooling with the parent template repo (template_python) for `/template` |
-| `modules/versioning/` | Dependency lock and workflow action-ref checks, and `VERSION`-file bumps (`project.py`) — see `versioning.instructions.md` / `version.instructions.md` |
+| `modules/setup/` | Repo bootstrap logic called by `setup.sh`/`setup.ps1` (`properties.py`) |
+| `modules/template/` | Syncs shared, generic tooling with the parent template repo for `/template` |
+| `modules/versioning/` | Checks `pyproject.toml` deps and workflow action refs against latest releases, updates locks; bumps the repo's `VERSION` file for deploys/releases (`project.py`) |
 
 ## Module Conventions
 - One concern per file; filename matches the concern in snake_case
 - Use module-level functions, not classes, unless state genuinely requires it
-- `modules/repo/*.py` and `modules/shopify/*.py` files each expose a `main()` entry point; a file may
-  expose additional public functions (not prefixed `_`) if it backs more than one invoke task —
-  e.g. `pr.py` exposes `main()` (diff context), `save_notes()`, and `create_pr()` for its three
-  `repo.pr_*` tasks
+- `modules/repo/*.py` files each expose a `main()` entry point; a file may expose additional public
+  functions (not prefixed `_`) if it backs more than one invoke task — e.g. `pr.py` exposes `main()`
+  (diff context), `save_notes()`, and `create_pr()` for its three `repo.pr_*` tasks
 - Private helpers are prefixed with `_` (e.g. `_stash_if_needed`)
 
 ## Method Patterns
@@ -54,19 +51,11 @@ def main() -> None:
 | Module | Use When |
 |--------|----------|
 | `cli.py` | Click-like `echo`, `prompt`, `confirm`, `is_tty`, `command`/`option` decorators |
-| `properties.py` | Read `properties.yml` / local Shopify config — `get_repo_local()`, `get_repo_remote()`, `is_ci()`, `get_shopify_store()`, `get_shopify_theme_id_dev()`, `get_shopify_theme_id_prd()`, `get_shopify_theme_id(env)`, `get_shopify_local_theme_token()`, `get_template_local()`, `get_template_remote()` |
-| `route_utils.py` | `find_repo_root()`, `build_env()` — used by `modules/template/route.py` |
+| `properties.py` | Read `properties.yml` — `get_repo_local()`, `get_repo_remote()`, `get_template_local()`, `get_template_remote()` |
 | `utils.py` | `success()`, `error()`, `warning()`, `info()`, `create_slug()` |
 
 ## Guidelines
-- Use `subprocess.run([...], cwd=repo_path, check=...)` for shell execution — never `shell=True` or string interpolation into shell commands
-- Use `modules.common.utils` for all console output; never bare `print()` in `modules/` code
 - Keep functions focused and single-purpose; extract private helpers instead of writing long functions
-- Add type hints to all function signatures
-- A `main()` wrapped in `@cli.command()` (e.g. `modules/setup/properties.py`) falls back to
-  parsing real CLI args via argparse when called with zero args/kwargs — fine when invoked
-  standalone (`python -m modules.x.y`), but calling it in-process from an invoke task with no
-  kwargs makes it parse the *invoke* process's own `sys.argv` instead and fail on the leftover
-  task-name argument. Tasks with options (`ver.libs`, etc.) sidestep this by always passing kwargs
-  (`module.main(dry_run=dry_run, ...)`); a task with no options to pass (`setup.properties`) must
-  shell out instead (`context.run("python -m modules.setup.properties")`) to get a clean argv
+- Subprocess, logging/`print()`, and type-hint rules are covered once in
+  `.github/instructions/python.instructions.md` (always loaded alongside this file for any
+  `modules/**/*.py` edit) — not restated here

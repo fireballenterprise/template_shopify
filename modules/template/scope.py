@@ -11,7 +11,6 @@ INCLUDE_DIRS = [
     ".github/prompts",
     ".claude/commands",
     ".clinerules/workflows",
-    ".opencode/command",
     ".agents/skills",
 ]
 
@@ -24,7 +23,6 @@ ALWAYS_EXCLUDE_ROOT_NAMES = {
     "uv.lock",
     "active_topic.yml",
     "topics",
-    "screenshots",
 }
 
 # Cache/build artifact names -- excluded wherever they occur in a path, not just at the root
@@ -43,25 +41,31 @@ ALWAYS_EXCLUDE_EXACT_PATHS = {
     ".claude/settings.local.json",
 }
 
-# Shopify/Dawn theme-specific module directories -- never push these; template_python is a
-# generic Python template and has no notion of a Shopify theme.
+# Business-specific module/skill directories -- never push these.
 BUSINESS_DIRS = {
-    "modules/dawn",
-    "modules/shopify",
+    "modules/fireball",
+    "modules/financials",
+    ".agents/skills/fireball",
+    ".agents/skills/product-metadata",
 }
 
-# Shopify/Dawn/Fireball theme-specific instruction files -- never push these.
+# Business-specific instruction files -- never push these.
 BUSINESS_INSTRUCTION_FILES = {
-    ".github/instructions/dawn.instructions.md",
-    ".github/instructions/shopify.instructions.md",
-    ".github/instructions/fireball.instructions.md",
+    ".github/instructions/travel.instructions.md",
+    ".github/instructions/product_metadata.instructions.md",
 }
 
-# Filename stems tied to the Shopify/Dawn theme commands -- excluded across every command dir
-# (.github/prompts, .claude/commands, .clinerules/workflows, .opencode/command).
+# Filename stems tied to the fireball/product-metadata business commands -- excluded across
+# every command dir (.github/prompts, .claude/commands, .clinerules/workflows).
 BUSINESS_COMMAND_STEMS = {
-    "dawn",
-    "shopify",
+    "add_expense",
+    "add_size_chart",
+    "calc_cost",
+    "list_expenses",
+    "financials",
+    "update_card_limit",
+    "fireball",
+    "new_product_metadata",
 }
 
 

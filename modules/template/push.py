@@ -24,25 +24,9 @@ from pathlib import Path
 from ..common import cli as click
 from ..common.properties import get_repo_local, get_template_local
 from ..common.utils import error, success
+from .naming import rewrite_repo_references
 from .resolve import resolve_template_repo
 from .scope import is_excluded, iter_candidates
-
-_REPLACE_PLACEHOLDER = "\x00TEMPLATE_NAME\x00"
-
-
-def rewrite_repo_references(content: str, repo_name: str, template_name: str) -> str:
-    """
-    Replace references to the working repo's name with the template repo's name.
-
-    Safe when one name contains the other (e.g. template_my_vault contains my_vault):
-    existing template-name occurrences are masked with a placeholder first so they
-    survive the replacement untouched.
-    """
-    if not repo_name or repo_name == template_name:
-        return content
-    masked = content.replace(template_name, _REPLACE_PLACEHOLDER)
-    masked = masked.replace(repo_name, template_name)
-    return masked.replace(_REPLACE_PLACEHOLDER, template_name)
 
 
 def _read_rewritten(src: Path, repo_name: str, template_name: str) -> bytes:

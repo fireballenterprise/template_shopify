@@ -1,4 +1,4 @@
-"""Properties management for shopify_dawn_theme."""
+"""Properties management for AI research repository."""
 
 import os
 from functools import lru_cache
@@ -11,11 +11,6 @@ import yaml
 def _expand_path(value: str) -> Path:
     """Expand ~ and environment variables (e.g. $HOME) in a properties.yml path value."""
     return Path(os.path.expandvars(os.path.expanduser(value)))
-
-
-def is_ci() -> bool:
-    """Return True when running inside GitHub Actions."""
-    return os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
 
 
 @lru_cache(maxsize=1)
@@ -91,125 +86,6 @@ def get_repo_remote() -> str:
     return props["repo"]["remote"]
 
 
-def get_shopify_local_config_path() -> Path:
-    """
-    Get the local path to the gitignored Shopify config file.
-
-    A relative path is resolved against this repo's root.
-
-    Returns:
-        Path to the local Shopify config file.
-    """
-    props = get_properties()
-    local = _expand_path(props["shopify"]["local_config"])
-    return local if local.is_absolute() else get_repo_root() / local
-
-
-@lru_cache(maxsize=1)
-def get_shopify_local_config() -> dict[str, Any]:
-    """
-    Load the gitignored Shopify config file (token path, store, theme IDs), cached.
-
-    Kept out of properties.yml (and out of git) since it identifies the store
-    and both theme IDs.
-
-    Returns:
-        Dictionary with the local Shopify config.
-
-    Raises:
-        FileNotFoundError: If the config file does not exist.
-    """
-    config_file = get_shopify_local_config_path()
-    if not config_file.is_file():
-        msg = (
-            f"Local Shopify config not found: {config_file}\n"
-            "Create it with 'local_theme_token', 'store', 'theme_id_dev', and 'theme_id_prd' keys."
-        )
-        raise FileNotFoundError(msg)
-
-    with config_file.open(encoding="utf-8") as f:
-        return yaml.safe_load(f)
-
-
-def get_shopify_local_theme_token() -> Path:
-    """
-    Get the local path to the Shopify Theme Access token file.
-
-    A relative path is resolved against this repo's root.
-
-    Returns:
-        Path to the token file.
-    """
-    local = _expand_path(get_shopify_local_config()["local_theme_token"])
-    return local if local.is_absolute() else get_repo_root() / local
-
-
-def get_shopify_store() -> str:
-    """
-    Get the Shopify store domain.
-
-    Reads from the SHOPIFY_FLAG_STORE env var in CI (set from a secret), or from the
-    local Shopify config file otherwise.
-
-    Returns:
-        Shopify store domain (e.g. "mystore.myshopify.com").
-    """
-    if is_ci():
-        return os.environ["SHOPIFY_FLAG_STORE"]
-    return str(get_shopify_local_config()["store"])
-
-
-def get_shopify_theme_id_dev() -> str:
-    """
-    Get the Shopify development theme ID.
-
-    Reads from the SHOPIFY_THEME_ID_DEV env var in CI (set from a secret), or from the
-    local Shopify config file otherwise.
-
-    Returns:
-        Development theme ID.
-    """
-    if is_ci():
-        return os.environ["SHOPIFY_THEME_ID_DEV"]
-    return str(get_shopify_local_config()["theme_id_dev"])
-
-
-def get_shopify_theme_id_prd() -> str:
-    """
-    Get the Shopify production (live) theme ID.
-
-    Reads from the SHOPIFY_THEME_ID_PRD env var in CI (set from a secret), or from the
-    local Shopify config file otherwise.
-
-    Returns:
-        Production theme ID.
-    """
-    if is_ci():
-        return os.environ["SHOPIFY_THEME_ID_PRD"]
-    return str(get_shopify_local_config()["theme_id_prd"])
-
-
-def get_shopify_theme_id(env: str) -> str:
-    """
-    Get the Shopify theme ID for an environment shortcut.
-
-    Args:
-        env: Either "dev" or "prd".
-
-    Returns:
-        The resolved theme ID.
-
-    Raises:
-        ValueError: If env is not "dev" or "prd".
-    """
-    if env == "dev":
-        return get_shopify_theme_id_dev()
-    if env == "prd":
-        return get_shopify_theme_id_prd()
-    msg = f"Unknown Shopify environment {env!r} — expected 'dev' or 'prd'."
-    raise ValueError(msg)
-
-
 def get_template_local() -> Path:
     """
     Get the local path to the shared template repo (template_python), used by /template.
@@ -233,3 +109,51 @@ def get_template_remote() -> str:
     """
     props = get_properties()
     return props["template"]["remote"]
+
+
+def get_expense_csv_path(year: int | None = None) -> Path:
+    """
+    Get expense CSV path.
+
+    Args:
+        year: Optional year override for expense CSV (defaults to configured path)
+
+    Returns:
+        Path to expense CSV file.
+    """
+    props = get_properties()
+    repo_local = get_repo_local()
+
+    csv_template = props["fireball"]["expense_csv"]
+    if year is None:
+        csv_path = csv_template
+    else:
+        csv_path = csv_template.format(year=year)
+
+    return repo_local / csv_path
+
+
+def get_disposed_equipment_csv_path() -> Path:
+    """
+    Get disposed equipment CSV path.
+
+    Returns:
+        Path to disposed equipment CSV file.
+    """
+    props = get_properties()
+    repo_local = get_repo_local()
+    csv_path = props["fireball"]["disposed_equipment_csv"]
+    return repo_local / csv_path
+
+
+def get_card_progress_csv() -> Path:
+    """
+    Get card progress CSV path.
+
+    Returns:
+        Path to card progress CSV file.
+    """
+    props = get_properties()
+    repo_local = get_repo_local()
+    csv_path = props["financials"]["card_progress_csv"]
+    return repo_local / csv_path

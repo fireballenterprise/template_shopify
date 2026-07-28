@@ -94,6 +94,7 @@ def _resolve_conflicts(repo_path: Path) -> None:
     click.echo("Conflict resolution complete")
 
 
+@click.command()
 def main() -> None:
     """Rebase onto the remote default branch (optionally squash first)."""
     repo_path = get_repo_local()
@@ -139,4 +140,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    main()  # pylint: disable=no-value-for-parameter

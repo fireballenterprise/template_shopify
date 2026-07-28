@@ -3,7 +3,9 @@
 from invoke import task
 
 from modules.repo import log as log_module
-from modules.repo import pr as pr_module
+from modules.repo import pr_create as pr_create_module
+from modules.repo import pr_diff as pr_diff_module
+from modules.repo import pr_notes as pr_notes_module
 from modules.repo import pull as pull_module
 from modules.repo import push as push_module
 from modules.repo import rebase as rebase_module
@@ -19,7 +21,7 @@ def pull(_context):
 @task
 def push(_context):
     """Push to git remote (fix → test → commit → push)"""
-    push_module.main(confirm=False)
+    push_module.main(no_confirm=True)
 
 
 @task
@@ -43,16 +45,16 @@ def rebase(_context):
 @task
 def pr_diff(_context):
     """Show current branch's commit log/diff vs. its detected base branch"""
-    pr_module.main()
+    pr_diff_module.main()
 
 
 @task
 def pr_notes_save(_context, content=None):
     """Save PR notes to tmp/pull_requests/"""
-    pr_module.save_notes(content=content)
+    pr_notes_module.main(content=content)
 
 
 @task
 def pr_create(_context, title=None, content=None):
     """Open a GitHub PR for the current branch (gh pr create)"""
-    pr_module.create_pr(title=title, content=content)
+    pr_create_module.main(title=title, content=content)
