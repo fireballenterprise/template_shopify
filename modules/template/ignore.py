@@ -1,4 +1,10 @@
-"""Exclusion rules for /template pull's local clobber-copy."""
+"""Exclusion rules for /template pull's local clobber-copy and /template push's scope.
+
+No hardcoded file list here: cache/build artifacts are already skipped because both directions
+read `git ls-files` (which respects the source repo's own `.gitignore`), and everything else
+project-specific (`properties.yml`, `README.md`, business modules, personal-vault content, ...)
+is declared once in `template.ignore.yml`, including that file's own name so it protects itself.
+"""
 
 from __future__ import annotations
 
@@ -6,44 +12,6 @@ import fnmatch
 from pathlib import Path
 
 import yaml
-
-# Root-only entries -- never pulled down from the template repo, regardless of template.ignore.yml.
-HARD_EXCLUDE_ROOT_NAMES = {
-    "properties.yml",
-    "properties.yml.example",
-    "README.md",
-    "LICENSE",
-    "pyproject.toml",
-    "uv.lock",
-    "VERSION",
-    "template.ignore.yml",
-}
-
-# Cache/build artifact names -- excluded wherever they occur in a path, not just at the root.
-HARD_EXCLUDE_ANYWHERE_NAMES = {
-    ".git",
-    ".venv",
-    "__pycache__",
-    ".ruff_cache",
-    "logs",
-    "tmp",
-}
-
-# One-off nested files, matched by their full relative path.
-HARD_EXCLUDE_EXACT_PATHS = {
-    ".claude/settings.local.json",
-}
-
-
-def is_hard_excluded(rel_path: Path) -> bool:
-    """Return True if rel_path must never be touched by /template pull, ignore file aside."""
-    posix = rel_path.as_posix()
-    parts = rel_path.parts
-    if posix in HARD_EXCLUDE_EXACT_PATHS:
-        return True
-    if parts and parts[0] in HARD_EXCLUDE_ROOT_NAMES:
-        return True
-    return any(part in HARD_EXCLUDE_ANYWHERE_NAMES for part in parts)
 
 
 def load_ignore_patterns(repo_root: Path) -> list[str]:

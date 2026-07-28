@@ -55,9 +55,8 @@ This applies to:
 **When to apply it:** alphabetize when *adding* a new function/constant (insert it in alphabetical
 position), or when a file is already being edited for another reason and its ordering needs
 correcting. This is not a mandate to do a repo-wide resort pass — a file you aren't otherwise
-touching stays as-is, even if its existing order predates this rule (e.g.
-`modules/template/scope.py`'s constants are grouped by concern, not alphabetical, and aren't
-retroactively fixed by this rule alone).
+touching stays as-is, even if its existing order predates this rule (e.g. some files group
+constants by concern instead, and aren't retroactively fixed by this rule alone).
 
 ```python
 # ✅ CORRECT — alphabetical

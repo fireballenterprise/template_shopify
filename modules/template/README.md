@@ -54,12 +54,12 @@ When the template repo is local (`TEMPLATE_LOCAL=true`), `pull copy` does the ac
 deterministically — no AI-driven diffing:
 
 1. Lists every git-tracked file in the parent (`git ls-files`, so the parent's own gitignored/
-   untracked junk is skipped automatically).
-2. Drops anything matched by `modules/template/ignore.py`'s hardcoded safety excludes
-   (`properties.yml`, `README.md`, `LICENSE`, `uv.lock`, `pyproject.toml`, `VERSION`,
-   `.claude/settings.local.json`, `template.ignore.yml` itself, cache/build dirs) or by this
-   project's `template.ignore.yml` `exclude:` list (project-specific content dirs the parent has
-   no equivalent of).
+   untracked junk -- caches, build artifacts, `.venv/`, etc. -- is skipped automatically; nothing
+   about that is hardcoded here).
+2. Drops anything matched by this project's `template.ignore.yml` `exclude:` list -- the only
+   other exclusion mechanism, covering everything project-specific the parent has no equivalent of
+   (`properties.yml`, `README.md`, business modules, personal-vault content, and its own filename
+   so local customizations survive future pulls).
 3. Overwrites every remaining file outright — text files get the parent's name rewritten to this
    repo's name via `modules/template/naming.py` (the same rename helper `push` uses, in reverse);
    binary files copy as-is. No per-file diff or confirmation: the working tree is git-tracked, so
@@ -73,9 +73,11 @@ resolution happens in the `/template` prompt itself, not here — see
 ## Push
 
 Proposes new generic improvements from this repo (in `modules/`, `.github/instructions/`,
-`.github/prompts/`, `.claude/commands/`, `.clinerules/workflows/`, `.agents/skills/` —
-excluding business-specific fireball/product-metadata content, see
-`modules/template/scope.py`) into the parent template repo as a pull request.
+`.github/prompts/`, `.claude/commands/`, `.clinerules/workflows/`, `.agents/skills/`) into the
+parent template repo as a pull request. Candidates come from `git ls-files` (so this repo's own
+`.gitignore` is already applied) filtered again by `template.ignore.yml` -- the same file `pull`
+uses, applied in reverse so project-specific content (business modules, personal-vault content,
+...) never leaks upstream. See `modules/template/scope.py`.
 
 Three phases, split at the confirmation boundary so the agent can check in with the user between
 each step:
@@ -103,8 +105,10 @@ modules/template/route.py
 modules/template/pull.py                   modules/template/push.py
   ↓ resolve          ↓ copy                      ↓ diff / apply / create-pr
   │                  modules/template/ignore.py  modules/template/scope.py
-  │                  (hard excludes +            (fixed include/exclude rules)
-  │                   template.ignore.yml)
+  │                  (template.ignore.yml only   (INCLUDE_DIRS + git ls-files +
+  │                   -- .gitignore is handled    template.ignore.yml via ignore.py)
+  │                   via git ls-files, not
+  │                   hardcoded)
   │                  ↓
   │                  modules/template/naming.py  ←──────────────────┘
   │                  (shared repo-name rewrite, used by both pull and push)
