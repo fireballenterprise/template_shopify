@@ -20,13 +20,12 @@ use Pull's fallback path (step 3) instead of its default copy.
 
 2. **Default path — `TEMPLATE_LOCAL=true` and the user didn't ask for a manual/diff review:**
    using the Bash tool, run `uv run --no-sync python -m modules.template.route "pull copy"`. This
-   clobber-copies every git-tracked file from the template repo into this project, skipping:
-   - the built-in safety excludes in `modules/template/ignore.py` (`properties.yml`,
-     `properties.yml.example`, `README.md`, `LICENSE`, `uv.lock`, `pyproject.toml`, `VERSION`,
-     `.claude/settings.local.json`, `template.ignore.yml`, and cache/build dirs like `.git/`,
-     `.venv/`, `__pycache__/`, `logs/`, `tmp/`)
-   - anything listed in this project's `template.ignore.yml` `exclude:` list — add project-specific
-     content directories there (e.g. `topics/`, `active_topic.yml`) so future pulls leave them alone
+   clobber-copies every git-tracked file from the template repo into this project — `git ls-files`
+   already skips whatever the template repo's own `.gitignore` covers (caches, build artifacts,
+   `.venv/`, etc.), and this project's `template.ignore.yml` `exclude:` list skips everything else
+   project-specific (`properties.yml`, `README.md`, business modules, personal-vault content, ...).
+   Nothing is hardcoded in the Python code — populate `template.ignore.yml` with whatever this
+   project needs protected, including its own filename so local customizations survive future pulls.
    Text files get the template repo's name rewritten to this repo's name (basenames of
    `template.local`/`repo.local` in `properties.yml`); binary files copy as-is. Every other synced
    file is overwritten outright — no per-file diff or confirmation.
@@ -39,8 +38,9 @@ use Pull's fallback path (step 3) instead of its default copy.
    compare the template repo against this project by hand instead of running `pull copy`. Slower
    and less complete than the copy above; prefer it only when there's no local template checkout.
 
-   a. **Always exclude** (never touch, even if present in the template repo): everything in step
-      2's built-in safety excludes, plus this project's `template.ignore.yml` `exclude:` list.
+   a. **Always exclude** (never touch, even if present in the template repo): whatever the
+      template repo's `.gitignore` covers, plus this project's `template.ignore.yml`
+      `exclude:` list.
    b. **Shared tooling — sync these by default** if present in the template repo: `modules/`,
       `tasks/`, `.github/instructions/`, `.github/prompts/`, `.github/workflows/`,
       `.claude/commands/`, `.vscode/`, `invoke.yml`, `setup.sh`, `CLAUDE.md`, `.editorconfig`,
@@ -62,21 +62,18 @@ use Pull's fallback path (step 3) instead of its default copy.
 ## Push
 
 Push proposes NEW generic improvements made in this repo into its parent template repo as a pull
-request. Only genuinely generic, non-business content may be proposed — never fireball/
-product-metadata content.
+request. Only genuinely generic, project-agnostic content may be proposed — nothing specific to
+this fork's own business or personal use.
 
 **Scope** (enforced by `modules/template/scope.py`, mirrored here for visibility):
 - Eligible directories: `modules/`, `.github/instructions/`, `.github/prompts/`,
   `.claude/commands/`, `.clinerules/workflows/`, `.agents/skills/`.
-- Always excluded everywhere: `topics/`, `properties.yml`, `active_topic.yml`,
-  `uv.lock`, `README.md`, `LICENSE`, `pyproject.toml`, `.claude/settings.local.json`, `.git/`,
-  `.venv/`, `__pycache__/`, `.ruff_cache/`, `logs/`, `tmp/`.
-- Always excluded business content: `modules/fireball/`, `modules/financials/`,
-  `.agents/skills/fireball/`, `.agents/skills/product-metadata/`,
-  `.github/instructions/travel.instructions.md`,
-  `.github/instructions/product_metadata.instructions.md`, and every prompt/command/workflow
-  file for `add_expense`, `add_size_chart`, `calc_cost`, `list_expenses`, `financials`,
-  `update_card_limit`, `fireball`, `new_product_metadata`.
+- Candidates come from `git ls-files`, so anything this repo's own `.gitignore` covers is already
+  excluded — nothing hardcoded for that.
+- Also excluded: anything in this project's `template.ignore.yml` `exclude:` list — the same file
+  `/template pull` uses to protect project-specific content, applied here in the other direction so
+  it never leaks upstream either. A fork with its own business modules or personal-vault content
+  (e.g. `modules/fireball/`, `topics/`) lists them there; the root template hardcodes none of it.
 
 Repo-name references are rewritten automatically on copy (this repo's name → the template repo's
 name, both derived from `properties.yml` `repo.local`/`template.local` basenames), so name-only

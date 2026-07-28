@@ -17,7 +17,7 @@ from pathlib import Path
 from ..common import cli as click
 from ..common.properties import get_repo_local, get_template_local
 from ..common.utils import success
-from .ignore import is_hard_excluded, load_ignore_patterns, matches_ignore
+from .ignore import load_ignore_patterns, matches_ignore
 from .naming import rewrite_repo_references
 from .resolve import resolve_template_repo
 
@@ -40,8 +40,9 @@ def run_copy() -> None:
     """
     Clobber-copy every git-tracked file from the local template repo into this project.
 
-    Skips modules/template/ignore.py's hard safety excludes and anything matching this project's
-    template.ignore.yml. No per-file diff or confirmation -- the working tree is git-tracked, so
+    `git ls-files` already respects the template repo's own `.gitignore`, so cache/build artifacts
+    never show up here. Anything else project-specific is skipped via this project's
+    `template.ignore.yml`. No per-file diff or confirmation -- the working tree is git-tracked, so
     the resulting change is reviewed via `git status`/`git diff` after the fact, not before.
     """
     repo_root = get_repo_local()
@@ -52,7 +53,7 @@ def run_copy() -> None:
 
     copied: list[Path] = []
     for rel in _tracked_files(template_root):
-        if is_hard_excluded(rel) or matches_ignore(rel, ignore_patterns):
+        if matches_ignore(rel, ignore_patterns):
             continue
         src = template_root / rel
         dst = repo_root / rel
