@@ -1,1 +1,1 @@
-"""Common utilities for AI research automation."""
+"""Common utilities for repo automation."""

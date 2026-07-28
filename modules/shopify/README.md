@@ -44,4 +44,5 @@ into `development`.
 - Every module exposes a module-level `main()` entry point
 - Shell out to `git`/`shopify` via `subprocess.run([...], cwd=repo_path)` — never `shell=True`
 - Use `modules.common.cli` for prompts/output and `modules.common.utils` for success/error/warning messages
-- Resolve repo config via `modules.common.properties` (`get_repo_local()`, `get_shopify_store()`)
+- Resolve repo config via `modules.common.properties` (`get_repo_local()`) and
+  `modules.common.shopify` (`get_shopify_store()`)
