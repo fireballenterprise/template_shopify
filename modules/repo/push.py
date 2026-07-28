@@ -22,7 +22,7 @@ def run_tests(repo_path: Path) -> None:
     click.echo("🔧 Running automated code fixes...")
     try:
         subprocess.run(
-            ["uv", "run", "invoke", "fix"],
+            ["uv", "run", "--no-sync", "invoke", "fix"],
             cwd=repo_path,
             check=True,
             capture_output=False,  # Show output to user
@@ -36,7 +36,7 @@ def run_tests(repo_path: Path) -> None:
     # Run tests to validate code quality
     click.echo("🧪 Running tests to validate code quality...")
     result = subprocess.run(
-        ["uv", "run", "invoke", "test"],
+        ["uv", "run", "--no-sync", "invoke", "test"],
         cwd=repo_path,
         check=False,
         capture_output=True,

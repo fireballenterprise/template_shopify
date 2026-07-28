@@ -14,21 +14,24 @@ setup.sh          # Shell-based setup script (uv venv + uv sync)
 properties.yml    # Project configuration (repo path/remote, template path/remote)
 template.ignore.yml # Extra paths /template pull must never overwrite, on top of its built-in safety excludes
 modules/
-  common/         # cli.py, properties.py, utils.py — shared helpers
-  hermes/         # sync.py — syncs ~/.hermes/ config + SKILL.md (not an invoke task)
-  repo/           # pull.py, push.py, log.py, squash.py, rebase.py, pr_*.py — git/PR workflow modules
+  common/         # cli.py, properties.py, utils.py, shopify.py, route_utils.py — shared helpers
+  dawn/           # list.py, version.py, upgrade.py — list upstream Shopify/dawn tags, print the checked-out version, merge dawn_vanilla upgrades
+  repo/           # pull.py, push.py, log.py, squash.py, rebase.py, pr_*.py, route.py — git/PR workflow modules
   setup/          # properties.py — creates/stamps properties.yml, called by setup.sh/setup.ps1
+  shopify/        # deploy.py, env.py, pull.py, upgrade.py — Shopify CLI theme sync (not part of the shared template_python repo)
   template/       # ignore.py, naming.py, pull.py, push.py, resolve.py, route.py, scope.py — sync shared tooling with the parent template repo for /template
   versioning/     # libs.py, python.py, workflows.py, upgrade.py, project.py — check pyproject.toml deps & workflow action refs vs. latest releases, bump the repo's VERSION file
 tasks/
-  __init__.py     # Wires the invoke Collection (debug, repo, ruff, setup, template, tests, upgrade, uv, versioning) plus top-level aliases (fix, test, update)
+  __init__.py     # Wires the invoke Collection (dawn, debug, repo, ruff, setup, shopify, template, tests, upgrade, uv, versioning) plus top-level aliases (fix, test, update)
   combos.py       # Top-level aliases: fix, test, update
+  dawn.py         # dawn.list, dawn.version, dawn.upgrade
   debug.py        # debug.env — print cwd + sorted env vars
   repo.py         # repo.pull, repo.push, repo.log, repo.squash, repo.rebase, repo.pr_diff, repo.pr_notes_save, repo.pr_create
   ruff.py         # ruff.fix, ruff.format
   setup.py        # setup.properties — creates/stamps properties.yml
+  shopify.py      # shopify.deploy, shopify.env, shopify.fix, shopify.pull, shopify.upgrade
   template.py     # template.pull, template.pull_copy, template.push_diff, template.push_apply, template.push_create_pr
-  tests.py        # tests.actionlint, tests.pylint, tests.rufflint, tests.yamllint
+  tests.py        # tests.actionlint, tests.pylint, tests.rufflint, tests.yamllint, tests.theme_check
   upgrade.py      # upgrade (default), upgrade.python, upgrade.libs, upgrade.sync — installs; run ver.update first
   uv.py           # uv.upgrade_bin, uv.upgrade_libs
   versioning.py   # ver.libs, ver.python, ver.workflows, ver.all, ver.update, ver.upgrade, ver.project_bump_build, ver.project_bump_release
@@ -103,4 +106,12 @@ uv run --no-sync invoke upgrade.python # Upgrade Python only (installs, rebuilds
 uv run --no-sync invoke upgrade.libs   # Upgrade libraries only (uv sync --upgrade)
 uv run --no-sync invoke upgrade.sync   # Sync dependencies without checking for updates first
 uv run --no-sync invoke uv.upgrade_libs # Install the versions currently locked in pyproject.toml (uv sync)
+uv run --no-sync invoke dawn.list       # List every upstream Shopify/dawn tag, latest highlighted
+uv run --no-sync invoke dawn.version    # Print the Dawn theme version currently checked out
+uv run --no-sync invoke dawn.upgrade    # Merge the upgraded dawn_vanilla into a feature branch for manual conflict resolution
+uv run --no-sync invoke shopify.deploy  # Push local theme to Shopify (--env=dev or --env=prd)
+uv run --no-sync invoke shopify.env     # Print `export KEY=value` Shopify CLI env vars
+uv run --no-sync invoke shopify.fix     # Auto-correct Shopify theme-check offenses
+uv run --no-sync invoke shopify.pull    # Pull live theme from Shopify store to local branch (--env=dev/prd or --theme=<name_or_id>)
+uv run --no-sync invoke shopify.upgrade # Upgrade dawn_vanilla from upstream Shopify/dawn, then merge into development
 ```
