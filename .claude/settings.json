@@ -3,7 +3,6 @@
     "allow": [
       "Bash(uv run *)",
       "WebSearch",
-      "Bash($HOME/Development/levonbecker/ai_vault/.venv/bin/python3 -c ' *)",
       "Bash(echo *)",
       "Read(tmp/**)",
       "Bash(git *)",
