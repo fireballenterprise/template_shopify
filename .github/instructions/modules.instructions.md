@@ -11,7 +11,6 @@ Modules provide reusable Python logic consumed by invoke tasks, prompts, and scr
 | Path | Purpose |
 |------|---------|
 | `modules/common/` | Helpers tightly coupled to invoke tasks (`cli`, `properties`, `utils`); non-generic, project-specific helpers get their own file here (e.g. `shopify.py`) rather than living in `properties.py`, which mirrors the shared `template_python` repo verbatim for easy sync |
-| `modules/hermes/` | Syncs `~/.hermes/` config + SKILL.md (`sync.py`, not an invoke task) |
 | `modules/repo/` | Git/PR workflow logic (pull, push, log, squash, rebase, pr) |
 | `modules/setup/` | Repo bootstrap logic called by `setup.sh`/`setup.ps1` (`properties.py`) |
 | `modules/template/` | Syncs shared, generic tooling with the parent template repo for `/template` |

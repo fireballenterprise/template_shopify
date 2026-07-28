@@ -5,6 +5,7 @@ Shopify theme workflow logic invoked by the `shopify.*` invoke tasks (see [tasks
 | Module | Purpose |
 |--------|---------|
 | `env.py` | Print `export KEY=value` Shopify CLI env vars (store, token, theme IDs) for shell eval |
+| `deploy.py` | Push local theme files to a Shopify theme (`dev` or `prd`) |
 | `pull.py` | Pull the live theme from a Shopify store into the local `development` branch |
 | `upgrade.py` | Upgrade `dawn_vanilla` from upstream `Shopify/dawn`, then merge into `development` |
 
@@ -16,6 +17,15 @@ eval "$(uv run --no-sync invoke shopify.env)"
 ```
 A child process can't export env vars into the calling shell directly, so this `eval` form is
 the supported way to load them into your current session — there is no separate shell script wrapper.
+
+## `deploy.py` — `shopify.deploy`
+
+Pushes local theme files to a Shopify theme.
+
+**Workflow:**
+1. Ensure `SHOPIFY_FLAG_STORE` and `SHOPIFY_CLI_THEME_TOKEN` are set (prompts interactively if missing)
+2. Resolve the target theme ID from `env` (`dev`/`prd`)
+3. Run `shopify theme push --force --theme=<id> --store=<store>` (adds `--allow-live` for `prd`)
 
 ## `pull.py` — `shopify.pull`
 
