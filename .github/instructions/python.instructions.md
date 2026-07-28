@@ -21,10 +21,15 @@ Target: `>=3.14` (defined in `pyproject.toml`, pinned in `.python-version`)
 - Use module-level functions (`def foo():`), not classes, unless state genuinely requires it
 - Files under `modules/common/` provide shared helpers (`cli`, `properties`, `utils`)
 - Files under `modules/repo/` provide git workflow logic; each exposes a `main()` entry point
-- Files under `modules/shopify/` provide Shopify theme workflow logic; each exposes a `main()` entry point
-- Files under `modules/versioning/` provide dependency/action/Dawn version checks; each exposes a `main()` entry point
 - Use type hints on function signatures (`def foo(x: int) -> str:`)
 - Prefer `pathlib.Path` over string paths
+
+## Constants
+- Module-level constants use `UPPER_SNAKE_CASE` (PEP 8)
+- Order them alphabetically within their file — same rule, and same trigger, as the function
+  ordering in `.github/instructions/style.instructions.md`'s Alphabetical Ordering section: insert
+  a new constant in alphabetical position, and correct existing ordering when you're already
+  editing that file for another reason — not a mandate to resort files you aren't touching
 
 ## Logging & Output
 - Use `modules.common.utils` helpers for all console output — `success()`, `error()`, `warning()`, `info()`

@@ -1,4 +1,4 @@
-"""Shared helpers for OpenCode routing modules."""
+"""Shared helpers for AI-tool command routing modules."""
 
 from __future__ import annotations
 

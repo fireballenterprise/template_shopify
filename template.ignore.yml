@@ -1,0 +1,42 @@
+---
+# Paths (relative to repo root) that `/template pull` must never overwrite, on top of the
+# built-in safety excludes in modules/template/ignore.py (properties.yml, properties.yml.example,
+# README.md, LICENSE, uv.lock, pyproject.toml, VERSION, .claude/settings.local.json, this file,
+# and cache/build dirs like .git/, .venv/, __pycache__/, logs/, tmp/).
+#
+# Entries match a file/dir prefix or a glob pattern, e.g. "topics/", "active_topic.yml", "*.local.*".
+# This file is itself excluded from /template pull, so local customizations survive future pulls.
+exclude:
+  - properties.yml
+  - properties.yml.example
+  - README.md
+  - LICENSE
+  - uv.lock
+  - VERSION
+  - pyproject.toml
+  - .claude/settings.local.json
+  - cspell.config.yaml
+  - .vscode/**
+  # Shopify theme content -- template_python has no notion of a Shopify theme, so none of
+  # this has an upstream equivalent to sync.
+  - assets/
+  - config/
+  - layout/
+  - locales/
+  - sections/
+  - snippets/
+  - templates/
+  - docs/
+  - .theme-check.yml
+  - .prettierrc.json
+  - release-notes.md
+  # Shopify automation's
+  - .claude/commands/dawn.md
+  - .claude/commands/shopify.md
+  - .github/instructions/dawn.instructions.md
+  - .github/instructions/fireball.instructions.md
+  - .github/instructions/shopify.instructions.md
+  - .github/prompts/dawn.prompts.md
+  - .github/prompts/shopify.prompts.md
+  - tasks/dawn.py
+  - tasks/shopify.py
