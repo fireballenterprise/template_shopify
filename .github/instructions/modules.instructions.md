@@ -10,7 +10,7 @@ Modules provide reusable Python logic consumed by invoke tasks, prompts, and scr
 ## Locations
 | Path | Purpose |
 |------|---------|
-| `modules/common/` | Helpers tightly coupled to invoke tasks (`cli`, `properties`, `utils`) |
+| `modules/common/` | Helpers tightly coupled to invoke tasks (`cli`, `properties`, `utils`); non-generic, project-specific helpers get their own file here (e.g. `shopify.py`) rather than living in `properties.py`, which mirrors the shared `template_python` repo verbatim for easy sync |
 | `modules/hermes/` | Syncs `~/.hermes/` config + SKILL.md (`sync.py`, not an invoke task) |
 | `modules/repo/` | Git/PR workflow logic (pull, push, log, squash, rebase, pr) |
 | `modules/setup/` | Repo bootstrap logic called by `setup.sh`/`setup.ps1` (`properties.py`) |
@@ -51,7 +51,8 @@ def main() -> None:
 | Module | Use When |
 |--------|----------|
 | `cli.py` | Click-like `echo`, `prompt`, `confirm`, `is_tty`, `command`/`option` decorators |
-| `properties.py` | Read `properties.yml` — `get_repo_local()`, `get_repo_remote()`, `get_template_local()`, `get_template_remote()` |
+| `properties.py` | Read `properties.yml` — `get_repo_local()`, `get_repo_remote()`, `get_template_local()`, `get_template_remote()`. Mirrors `template_python`'s copy exactly — don't add project-specific functions here |
+| `shopify.py` | Shopify store/theme config, not part of `template_python` — `get_shopify_store()`, `get_shopify_theme_id()`, `is_ci()` |
 | `utils.py` | `success()`, `error()`, `warning()`, `info()`, `create_slug()` |
 
 ## Guidelines

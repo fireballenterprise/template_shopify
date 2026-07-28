@@ -56,6 +56,12 @@ addons/
   be copied into a consuming repo's actual root (root-relative imports, `applyTo` globs, and task
   wiring all assume that). Excluded from `ruff`/`pylint` via `pyproject.toml`
   (`extend-exclude`/`ignore-paths`) for the same reason — see "Addons" in `README.md`
+- `.github/instructions/fireball.instructions.md` tracks this repo's own hand-written Shopify
+  theme customizations — every clone of `template_shopify` (this repo, under the
+  `fireballenterprise` GitHub org) is a Fireball-brand Shopify site, so the filename stays
+  `fireball.instructions.md` in every one of them; each repo keeps its own separate tracking
+  table (not synced content). Listed in `template.ignore.yml` so `/template pull` never
+  overwrites it
 
 ## Dependencies (pyproject.toml)
 - `invoke` — task runner

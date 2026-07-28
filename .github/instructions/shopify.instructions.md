@@ -85,6 +85,13 @@ Every customization must also have a row in the tracking table in
 `fireball.instructions.md` — add/update the row whenever a customization is added,
 disabled (commented out), or removed.
 
+Note this only applies to Dawn theme files — Dawn upgrades merge via git, so inline
+markers survive. The Python tooling under `modules/` follows the opposite rule: files
+that mirror the shared `template_python` repo (e.g. `modules/common/properties.py`) get
+overwritten wholesale by `/template pull`, so repo-specific additions there go in their
+own new file (e.g. `modules/common/shopify.py`) instead of being inlined — see
+`modules.instructions.md`.
+
 ## settings_schema.json / settings_data.json
 - `config/settings_schema.json` — defines theme editor controls
 - `config/settings_data.json` — stores current theme editor values (managed by Shopify GUI — do not manually edit)

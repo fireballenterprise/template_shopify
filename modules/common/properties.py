@@ -1,4 +1,4 @@
-"""Properties management for AI research repository."""
+"""Properties management for shopify_dawn_theme."""
 
 import os
 from functools import lru_cache
@@ -109,51 +109,3 @@ def get_template_remote() -> str:
     """
     props = get_properties()
     return props["template"]["remote"]
-
-
-def get_expense_csv_path(year: int | None = None) -> Path:
-    """
-    Get expense CSV path.
-
-    Args:
-        year: Optional year override for expense CSV (defaults to configured path)
-
-    Returns:
-        Path to expense CSV file.
-    """
-    props = get_properties()
-    repo_local = get_repo_local()
-
-    csv_template = props["fireball"]["expense_csv"]
-    if year is None:
-        csv_path = csv_template
-    else:
-        csv_path = csv_template.format(year=year)
-
-    return repo_local / csv_path
-
-
-def get_disposed_equipment_csv_path() -> Path:
-    """
-    Get disposed equipment CSV path.
-
-    Returns:
-        Path to disposed equipment CSV file.
-    """
-    props = get_properties()
-    repo_local = get_repo_local()
-    csv_path = props["fireball"]["disposed_equipment_csv"]
-    return repo_local / csv_path
-
-
-def get_card_progress_csv() -> Path:
-    """
-    Get card progress CSV path.
-
-    Returns:
-        Path to card progress CSV file.
-    """
-    props = get_properties()
-    repo_local = get_repo_local()
-    csv_path = props["financials"]["card_progress_csv"]
-    return repo_local / csv_path
