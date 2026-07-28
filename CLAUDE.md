@@ -3,6 +3,7 @@
 Before working in this repo, read the relevant files in `.github/instructions/`:
 
 - **Project layout & conventions**: `.github/instructions/index.instructions.md`
+- **Logic architecture (modules/tasks/prompts stack)**: `.github/instructions/logic.instructions.md`
 - **Python code**: `.github/instructions/python.instructions.md`
 - **Invoke tasks**: `.github/instructions/tasks.instructions.md`
 - **Shared modules**: `.github/instructions/modules.instructions.md`
@@ -14,6 +15,8 @@ Before working in this repo, read the relevant files in `.github/instructions/`:
 - **Markdown style**: `.github/instructions/style.instructions.md`
 - **Docs**: `.github/instructions/docs.instructions.md`
 - **Prompt files**: `.github/instructions/prompts.instructions.md`
+- **Git branches & PR descriptions**: `.github/instructions/git.instructions.md`
+- **Code review priorities**: `.github/instructions/review.instructions.md`
 
 **Source of truth: `.github/instructions/` and `.github/prompts/`** — all rules and slash commands
 live there. `.claude/commands/` mirrors `.github/prompts/` for Claude Code. Never duplicate rules

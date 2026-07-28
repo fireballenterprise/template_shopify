@@ -3,7 +3,7 @@
 import os
 
 from ..common import cli as click
-from ..common.properties import (
+from ..common.shopify import (
     get_shopify_local_theme_token,
     get_shopify_store,
     get_shopify_theme_id_dev,

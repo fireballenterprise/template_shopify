@@ -1,16 +1,43 @@
-# Common Modules
+# Common Utilities Module
 
-Shared helpers used by `modules/repo/*`, `modules/shopify/*`, and `tasks/*`.
+Shared utilities and helper functions used across all modules in the template_python repository.
 
-| Module | Purpose |
-|--------|---------|
-| `cli.py` | Click-like CLI compatibility helpers (`echo`, `prompt`, `confirm`, `command`, `option`) backed by `argparse` — avoids adding a `click` dependency |
-| `properties.py` | Reads `properties.yml` (cached): `get_repo_root()`, `get_properties()`, `get_repo_local()`, `get_repo_remote()`, `get_shopify_store()`, `get_shopify_theme_id_dev()`, `get_shopify_theme_id_prd()`, `get_shopify_local_theme_token()`, `get_template_local()`, `get_template_remote()` |
-| `route_utils.py` | `find_repo_root()`, `build_env()` — used by `modules/template/route.py` to locate the repo root and pass `active_topic.yml` context through to subprocess calls |
-| `utils.py` | Output helpers (`success`, `error`, `warning`, `info`) and `create_slug()` |
+## Overview
 
-## Conventions
+This module provides common functionality that is used by other modules throughout the repository, including configuration parsing and utility functions.
 
-- All functions are module-level (no classes except small validator helpers in `cli.py`)
-- `error()` prints to stderr and calls `sys.exit()` — use for unrecoverable failures
-- `get_repo_root()`/`get_properties()` are `lru_cache`d singletons — safe to call repeatedly
+## Modules
+
+### `utils.py`
+
+Common utility functions for console output, error handling, and shared operations.
+
+**Functions:**
+- `success(message)` - Print success messages with ✅ emoji
+- `error(message)` - Print error messages with ❌ emoji  
+- `warning(message)` - Print warning messages with ⚠️ emoji
+- `info(message)` - Print info messages with ℹ️ emoji
+
+## Dependencies
+
+This module depends on:
+- `common.properties` - For reading configuration from `properties.yml`
+- Standard library: `pathlib`, `shutil`
+- Internal CLI helper: `modules/common/cli.py` (TUI-safe prompt/confirm/option handling)
+
+## Architecture
+
+The common module follows these principles:
+- **Shared utilities only** - Functions used by multiple modules
+- **No business logic** - Pure utility functions
+- **Minimal dependencies** - Only depends on standard library and config
+- **Clear error messages** - User-friendly output with emojis
+- **Type hints** - Full type annotations for all functions
+
+## Integration
+
+Other modules import from common:
+
+```python
+from modules.common.utils import success, error, warning, info
+```

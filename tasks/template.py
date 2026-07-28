@@ -9,7 +9,13 @@ from modules.template import push as push_module
 @task
 def pull(_context):
     """Resolve the local path to the parent template repo (clone from remote if not found locally)"""
-    pull_module.main()
+    pull_module.run_resolve()
+
+
+@task
+def pull_copy(_context):
+    """Clobber-copy git-tracked files from a local template repo into this project (see template.ignore.yml)"""
+    pull_module.run_copy()
 
 
 @task

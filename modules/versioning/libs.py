@@ -1,15 +1,8 @@
+"""Update Python package dependencies in pyproject.toml to latest versions.
+
+IMPORTANT: This only updates the config file. Run /upgrade libs to actually
+install the new versions.
 """
-Check pyproject.toml [project.dependencies] against the latest published releases.
-
-Only updates the version locks in pyproject.toml — does NOT install anything.
-Run `uv run --no-sync invoke uv.upgrade` afterward to install the new versions.
-
-Usage:
-    uv run --no-sync python -m modules.versioning.libs
-    uv run --no-sync invoke ver.libs
-"""
-
-from __future__ import annotations
 
 import json
 import re
@@ -18,147 +11,300 @@ from pathlib import Path
 
 import tomlkit
 
-from ..common import cli as click
-from ..common.properties import get_repo_root
+from ..common import cli
+from ..common.properties import get_repo_local
 from ..common.utils import error, info, success
 
-_DEPENDENCY_RE = re.compile(r"^([a-zA-Z0-9_-]+)\s*([~=><]+)\s*([\d.]+)")
 
-
-def _get_installed_packages(repo_root: Path) -> list[dict]:
-    """Return installed packages via `uv pip list --format json`."""
-    result = subprocess.run(
-        ["uv", "pip", "list", "--format", "json"],
-        cwd=repo_root,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if result.returncode != 0:
-        error(f"Failed to list installed packages: {result.stderr}")
-    return json.loads(result.stdout) if result.stdout else []
-
-
-def _get_outdated_packages(repo_root: Path) -> list[dict]:
-    """Return outdated packages via `uv pip list --outdated --format json`."""
+def get_outdated_packages() -> list[dict]:
+    """Get list of outdated packages from uv pip list."""
     result = subprocess.run(
         ["uv", "pip", "list", "--outdated", "--format", "json"],
-        cwd=repo_root,
         capture_output=True,
         text=True,
         check=False,
     )
+
     if result.returncode != 0:
-        error(f"Failed to check for outdated packages: {result.stderr}")
+        error(f"Failed to get outdated packages: {result.stderr}")
+
     return json.loads(result.stdout) if result.stdout else []
 
 
-def _load_pyproject(repo_root: Path) -> tuple[tomlkit.TOMLDocument, Path]:
+def get_installed_packages() -> list[dict]:
+    """Get list of installed packages from uv pip list."""
+    result = subprocess.run(
+        ["uv", "pip", "list", "--format", "json"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    if result.returncode != 0:
+        error(f"Failed to get installed packages: {result.stderr}")
+
+    return json.loads(result.stdout) if result.stdout else []
+
+
+def load_pyproject(repo_path: Path):
     """Load pyproject.toml with tomlkit to preserve formatting."""
-    pyproject_path = repo_root / "pyproject.toml"
+    pyproject_path = repo_path / "pyproject.toml"
+
     if not pyproject_path.exists():
         error(f"pyproject.toml not found at {pyproject_path}")
-    with pyproject_path.open(encoding="utf-8") as f:
+
+    with open(pyproject_path, encoding="utf-8") as f:
         return tomlkit.load(f), pyproject_path
 
 
-def _parse_dependency(dep_string: str) -> dict | None:
-    """Parse a dependency string into name/operator/version.
+def parse_dependency(dep_string: str) -> dict | None:
+    """Parse dependency string into name, operator, version components.
 
-    Example: "ruff~=0.15.4" -> {"name": "ruff", "operator": "~=", "version": "0.15.4"}
+    Examples:
+        "click~=8.1.7" -> {"name": "click", "operator": "~=", "version": "8.1.7"}
+        "pytest==8.3.4" -> {"name": "pytest", "operator": "==", "version": "8.3.4"}
     """
-    match = _DEPENDENCY_RE.match(dep_string)
+    match = re.match(r"^([a-zA-Z0-9_-]+)\s*([~=><]+)\s*([\d.]+)", dep_string)
     if not match:
         return None
-    return {"name": match.group(1), "operator": match.group(2), "version": match.group(3)}
+
+    return {
+        "name": match.group(1),
+        "operator": match.group(2),
+        "version": match.group(3),
+    }
 
 
-def _find_updates(toml_doc: tomlkit.TOMLDocument, outdated: list[dict], installed: list[dict]) -> list[dict]:
-    """Find [project.dependencies] entries with a newer version available than what's pinned."""
-    outdated_lookup = {pkg["name"].lower(): pkg["latest_version"] for pkg in outdated}
-    installed_lookup = {pkg["name"].lower(): pkg["version"] for pkg in installed}
+def get_declared_dependency_names(toml_doc) -> set[str]:
+    """Return lowercase names of every dependency declared in [project.dependencies] and
+    [project.optional-dependencies]."""
+    names: set[str] = set()
 
-    deps_list = toml_doc.get("project", {}).get("dependencies", [])
+    if "project" in toml_doc and "dependencies" in toml_doc["project"]:
+        for dep_string in toml_doc["project"]["dependencies"]:
+            parsed = parse_dependency(dep_string)
+            if parsed:
+                names.add(parsed["name"].lower())
+
+    if "project" in toml_doc and "optional-dependencies" in toml_doc["project"]:
+        for deps_list in toml_doc["project"]["optional-dependencies"].values():
+            for dep_string in deps_list:
+                parsed = parse_dependency(dep_string)
+                if parsed:
+                    names.add(parsed["name"].lower())
+
+    return names
+
+
+def find_updates(toml_doc, outdated_packages: list[dict], installed_packages: list[dict]) -> list[dict]:
+    """Find dependencies needing updates in both dependencies and optional-dependencies.
+
+    Returns:
+        List of update dictionaries with:
+            - package: package name
+            - old: old version with operator (e.g., "~=8.1.7")
+            - new: new version with operator (e.g., "~=8.3.1")
+            - group: dependency group name
+            - index: index in the list
+            - list_ref: reference to the list in tomlkit document
+    """
     updates = []
-    for index, dep_string in enumerate(deps_list):
-        parsed = _parse_dependency(dep_string)
-        if not parsed:
-            continue
-        pkg_lower = parsed["name"].lower()
-        latest = outdated_lookup.get(pkg_lower) or installed_lookup.get(pkg_lower)
-        if latest and latest != parsed["version"]:
-            updates.append(
-                {
-                    "package": parsed["name"],
-                    "operator": parsed["operator"],
-                    "current": parsed["version"],
-                    "latest": latest,
-                    "index": index,
-                }
-            )
+
+    # Create lowercase lookup for outdated and installed packages
+    outdated_lookup = {pkg["name"].lower(): pkg for pkg in outdated_packages}
+    installed_lookup = {pkg["name"].lower(): pkg for pkg in installed_packages}
+
+    def resolve_latest(pkg_lower: str) -> str | None:
+        if pkg_lower in outdated_lookup:
+            return outdated_lookup[pkg_lower]["latest_version"]
+        if pkg_lower in installed_lookup:
+            return installed_lookup[pkg_lower]["version"]
+        return None
+
+    # Process [project.dependencies]
+    if "project" in toml_doc and "dependencies" in toml_doc["project"]:
+        deps_list = toml_doc["project"]["dependencies"]
+        for i, dep_string in enumerate(deps_list):
+            parsed = parse_dependency(dep_string)
+            if not parsed:
+                continue
+
+            # Case-insensitive lowercase matching
+            pkg_lower = parsed["name"].lower()
+            latest_version = resolve_latest(pkg_lower)
+            if latest_version and parsed["version"] != latest_version:
+                updates.append(
+                    {
+                        "package": parsed["name"],
+                        "old": f"{parsed['operator']}{parsed['version']}",
+                        "new": f"{parsed['operator']}{latest_version}",
+                        "specified_version": parsed["version"],
+                        "latest_version": latest_version,
+                        "group": "dependencies",
+                        "index": i,
+                        "list_ref": deps_list,
+                    }
+                )
+
+    # Process [project.optional-dependencies]
+    if "project" in toml_doc and "optional-dependencies" in toml_doc["project"]:
+        for group_name, deps_list in toml_doc["project"]["optional-dependencies"].items():
+            for i, dep_string in enumerate(deps_list):
+                parsed = parse_dependency(dep_string)
+                if not parsed:
+                    continue
+
+                pkg_lower = parsed["name"].lower()
+                latest_version = resolve_latest(pkg_lower)
+                if latest_version and parsed["version"] != latest_version:
+                    updates.append(
+                        {
+                            "package": parsed["name"],
+                            "old": f"{parsed['operator']}{parsed['version']}",
+                            "new": f"{parsed['operator']}{latest_version}",
+                            "specified_version": parsed["version"],
+                            "latest_version": latest_version,
+                            "group": group_name,
+                            "index": i,
+                            "list_ref": deps_list,
+                        }
+                    )
+
     return updates
 
 
-def _display_updates_table(updates: list[dict]) -> None:
-    """Print a Package | Current | Latest table."""
-    pkg_width = max(len("Package"), *(len(u["package"]) for u in updates))
-    current_width = max(len("Current"), *(len(u["current"]) for u in updates))
-    latest_width = max(len("Latest"), *(len(u["latest"]) for u in updates))
-
-    def border(left: str, mid: str, right: str) -> str:
-        return f"{left}{'─' * (pkg_width + 2)}{mid}{'─' * (current_width + 2)}{mid}{'─' * (latest_width + 2)}{right}"
-
-    click.echo(border("╭", "┬", "╮"))
-    click.echo(f"│ {'Package'.ljust(pkg_width)} │ {'Current'.ljust(current_width)} │ {'Latest'.ljust(latest_width)} │")
-    click.echo(border("├", "┼", "┤"))
-    for update in updates:
-        click.echo(
-            f"│ {update['package'].ljust(pkg_width)} │ {update['current'].ljust(current_width)} │ "
-            f"{update['latest'].ljust(latest_width)} │"
-        )
-    click.echo(border("╰", "┴", "╯"))
-
-
-def _apply_updates(toml_doc: tomlkit.TOMLDocument, updates: list[dict]) -> None:
-    """Rewrite each updated dependency string in place, preserving its operator."""
-    deps_list = toml_doc["project"]["dependencies"]
-    for update in updates:
-        deps_list[update["index"]] = f"{update['package']}{update['operator']}{update['latest']}"
-
-
-@click.command()
-@click.option("--dry-run", is_flag=True, help="Show available updates without writing changes")
-@click.option("--yes", "-y", "no_confirm", is_flag=True, help="Skip the confirmation prompt")
-def main(dry_run: bool = False, no_confirm: bool = False) -> None:
-    """Check pyproject.toml dependencies against their latest releases and update version locks."""
-    info("Checking pyproject.toml dependencies for available updates...")
-    repo_root = get_repo_root()
-    installed = _get_installed_packages(repo_root)
-    outdated = _get_outdated_packages(repo_root)
-    toml_doc, pyproject_path = _load_pyproject(repo_root)
-    updates = _find_updates(toml_doc, outdated, installed)
-
+def display_updates_table(updates: list[dict]) -> None:
+    """Display updates grouped by dependency section with ASCII table."""
     if not updates:
-        success("All pyproject.toml dependencies are already at their latest version.")
         return
 
-    click.echo(f"\n{len(updates)} dependencies have newer versions available:\n")
-    _display_updates_table(updates)
+    # Group updates by section
+    grouped = {}
+    for update in updates:
+        group = update["group"]
+        if group not in grouped:
+            grouped[group] = []
+        grouped[group].append(update)
 
-    if dry_run:
-        click.echo("\nDry run: no changes made.")
-        return
+    # Display each group
+    for group, group_updates in grouped.items():
+        if group == "dependencies":
+            cli.echo("\n[project.dependencies]")
+        else:
+            cli.echo(f"\n[project.optional-dependencies.{group}]")
 
-    if not no_confirm and not click.confirm(f"\nUpdate {len(updates)} version lock(s) in pyproject.toml?"):
-        click.echo("Cancelled.")
-        return
+        pkg_width = max(len("Package"), *(len(u["package"]) for u in group_updates))
+        current_width = max(len("Current"), *(len(u.get("specified_version", "")) for u in group_updates))
+        latest_width = max(len("Latest"), *(len(u.get("latest_version", "")) for u in group_updates))
 
-    _apply_updates(toml_doc, updates)
-    with pyproject_path.open("w", encoding="utf-8") as f:
+        def border(left: str, mid: str, right: str, widths: tuple[int, int, int]) -> str:
+            pkg, current, latest = widths
+            return f"{left}{'─' * (pkg + 2)}{mid}{'─' * (current + 2)}{mid}{'─' * (latest + 2)}{right}"
+
+        widths = (pkg_width, current_width, latest_width)
+
+        # Table header
+        cli.echo(border("╭", "┬", "╮", widths))
+        cli.echo(
+            f"│ {'Package'.ljust(pkg_width)} │ {'Current'.ljust(current_width)} │ {'Latest'.ljust(latest_width)} │"
+        )
+        cli.echo(border("├", "┼", "┤", widths))
+
+        # Table rows
+        for update in group_updates:
+            pkg = update["package"].ljust(pkg_width)
+            old = update.get("specified_version", "").ljust(current_width)
+            new = update.get("latest_version", "").ljust(latest_width)
+            cli.echo(f"│ {pkg} │ {old} │ {new} │")
+
+        # Table footer
+        cli.echo(border("╰", "┴", "╯", widths))
+
+
+def apply_updates(updates: list[dict]) -> None:
+    """Apply updates to the tomlkit document in-place, preserving operators."""
+    for update in updates:
+        parsed = parse_dependency(str(update["list_ref"][update["index"]]))
+        if not parsed:
+            continue
+
+        # Extract new version from the "new" field (e.g., "~=8.3.1" -> "8.3.1")
+        new_version = update["new"].split(parsed["operator"])[1]
+        new_dep_string = f"{parsed['name']}{parsed['operator']}{new_version}"
+
+        # Update in place (tomlkit preserves structure)
+        update["list_ref"][update["index"]] = new_dep_string
+
+
+def save_pyproject(toml_doc, pyproject_path: Path) -> None:
+    """Save updated pyproject.toml preserving all formatting."""
+    with open(pyproject_path, "w", encoding="utf-8") as f:
         tomlkit.dump(toml_doc, f)
 
-    success(f"Updated {len(updates)} version lock(s) in pyproject.toml")
-    click.echo("Run `uv run --no-sync invoke uv.upgrade` to install the new versions.")
+
+@cli.command()
+@cli.option("--dry-run", is_flag=True, help="Show updates without applying")
+@cli.option("--yes", "-y", "no_confirm", is_flag=True, help="Skip confirmation")
+def main(dry_run: bool, no_confirm: bool) -> None:
+    """
+    Update Python package dependencies in pyproject.toml to latest versions.
+
+    IMPORTANT: This only updates the config file. Run /upgrade libs to actually
+    install the new versions.
+
+    Checks for outdated packages and updates both [project.dependencies]
+    and [project.optional-dependencies] sections, preserving version
+    constraint operators (~=, ==, >=, etc.).
+
+    Examples:
+        /update libs              # Interactive mode
+        /update libs --dry-run    # Preview changes
+        /update libs --yes        # Auto-confirm
+    """
+    info("Checking for dependency updates...")
+
+    # Get repository path
+    repo_path = get_repo_local()
+
+    # Get installed and outdated packages
+    installed_packages = get_installed_packages()
+    outdated_packages = get_outdated_packages()
+
+    # Load pyproject.toml
+    toml_doc, pyproject_path = load_pyproject(repo_path)
+
+    # Find updates
+    updates = find_updates(toml_doc, outdated_packages, installed_packages)
+
+    if not updates:
+        success("All pyproject.toml dependencies are up to date!")
+        if outdated_packages:
+            cli.echo(f"   (Found {len(outdated_packages)} outdated packages not in pyproject.toml)")
+        raise SystemExit(3)
+
+    # Display updates
+    cli.echo(f"\n📦 Found {len(updates)} outdated dependencies in pyproject.toml:")
+    display_updates_table(updates)
+
+    # Dry run mode
+    if dry_run:
+        cli.echo("\n🔍 Dry-run mode: No changes made")
+        return
+
+    # Confirmation
+    if not no_confirm:
+        cli.echo()
+        if not cli.confirm(f"💡 Update all {len(updates)} dependencies to latest versions?"):
+            cli.echo("Cancelled.")
+            raise SystemExit(2)
+
+    # Apply updates
+    cli.echo(f"\n✏️  Updating {len(updates)} dependencies in pyproject.toml...")
+    apply_updates(updates)
+    save_pyproject(toml_doc, pyproject_path)
+    success(f"Updated {len(updates)} dependencies in pyproject.toml")
+    cli.echo("\n💡 Run /upgrade libs to install these updates")
+    cli.echo()
 
 
 if __name__ == "__main__":

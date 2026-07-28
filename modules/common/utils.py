@@ -1,4 +1,4 @@
-"""Common utilities for shopify_dawn_theme automation."""
+"""Common utilities for repo automation."""
 
 import re
 import sys

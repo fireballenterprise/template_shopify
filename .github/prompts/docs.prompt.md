@@ -1,49 +1,36 @@
 ---
 name: docs
-description: Audit that .github/instructions/, .claude/commands/, and READMEs are in sync with current code and conversation, including rules the user has stated but not yet saved anywhere. Read-only — reports gaps, does not edit files until approved.
+description: Audit the repo for doc/AI-config drift against recent changes and fix anything stale (READMEs, .github/instructions/, AGENTS.md, CLAUDE.md, and the synced command dirs).
 argument-hint: no arguments required
 agent: agent
 ---
-Gather the scope of what has changed recently:
 
-!`git status --short`
+Gather what changed on this branch:
 
-!`git diff --stat development...HEAD`
+!`uv run --no-sync invoke repo.pr_diff`
 
-Check the following areas, in order, and build a single checklist of gaps. Do not edit any file
-until the user has reviewed the checklist and approved specific items.
+If that fails (e.g. no base branch found), fall back to `git status` and `git diff` against HEAD to
+see uncommitted changes instead.
 
-## 1. `.github/instructions/` accuracy
-Compare each file under `.github/instructions/` against what it documents (see the file table in
-`index.instructions.md`). Flag:
-- Tasks in `tasks/*.py` or modules in `modules/` that are new, renamed, or removed since the last
-  update to `tasks.instructions.md` / `modules.instructions.md`
-- Conventions introduced by the current diff (branch conventions, workflow jobs, dependency
-  changes) that aren't reflected in the relevant instructions file
-- Any Fireball customization added, disabled, or removed in this diff whose row in
-  `fireball.instructions.md`'s tracking table is missing or stale
+Using that diff, audit every doc and AI-config file that could be stale because of it. At minimum
+check:
 
-## 2. `.claude/commands/` sync with `.github/prompts/`
-`.github/prompts/*.prompt.md` is the source of truth (`prompts.instructions.md`). For every
-`.prompt.md` file, confirm a matching `.claude/commands/<slug>.md` exists and that its
-`description` still matches the prompt's frontmatter `description`. Flag:
-- A prompt file with no matching command file — suggest `uv run --no-sync invoke claude.sync`
-- A command file whose description has drifted from its prompt — suggest re-running
-  `uv run --no-sync invoke claude.sync --force`, and warn this overwrites hand-crafted extras
-  (`allowed-tools`, `argument-hint`, etc.), so confirm with the user before running it
+1. **Root `README.md`** — Setup, Project Structure, Invoke Tasks, AI Prompts, Modules sections.
+2. **Module READMEs** (`modules/*/README.md`) — for every module touched by the diff.
+3. **`.github/instructions/*.md`** — the source of truth for all AI rules; look for now-stale
+   references to removed/renamed modules, commands, tasks, or config keys.
+4. **`AGENTS.md` / `CLAUDE.md`** — thin pointer files; only need edits if the pointer chain itself
+   changed (rare).
+5. **The three synced command dirs** — `.github/prompts/*.prompt.md` (source of truth),
+   `.claude/commands/*.md`, `.clinerules/workflows/*.md` — these must describe the same behavior;
+   if one changed, the other two need the matching edit (see
+   `.github/instructions/prompts.instructions.md`).
+6. **`properties.yml.example`** and any other example/config file describing setup — if `setup.sh`,
+   `setup.ps1`, or `modules/setup/properties.py` changed what gets generated.
+7. Any other `*.md` file that references a file, command, module, or behavior touched by the diff.
 
-## 3. READMEs
-Check root `README.md` and every `modules/*/README.md` against the current invoke tasks, modules,
-and setup steps. Flag sections that reference removed or renamed things, or that omit something
-added in the current diff.
+For each stale doc you find, fix it directly — this is a repo-local consistency sweep, not a
+cross-repo sync, so no confirmation is needed before editing; git history is the safety net.
 
-## 4. Rules stated but not saved
-Scan the current conversation for any rule, correction, or preference the user gave (e.g. "always
-do X", "never do Y", "stop doing Z") that should govern future work in this repo, but that hasn't
-been written into a `.github/instructions/*.md` file, `CLAUDE.md`, or saved as a `feedback` /
-`project` memory (if running under Claude Code's auto-memory system). List each one with a
-suggested destination.
-
-## Reporting
-Present one checklist grouped by the four sections above. For each gap, ask which ones to fix, and
-only touch the files the user approves.
+When done, report a short summary: which files you updated and why, or "no doc drift found" if
+everything was already current.

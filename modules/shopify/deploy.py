@@ -3,7 +3,7 @@
 import subprocess
 
 from ..common import cli as click
-from ..common.properties import get_shopify_store, get_shopify_theme_id
+from ..common.shopify import get_shopify_store, get_shopify_theme_id
 from ..common.utils import error, success
 from .env import ensure_env
 

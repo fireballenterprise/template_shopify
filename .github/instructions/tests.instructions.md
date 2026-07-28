@@ -1,55 +1,74 @@
 ---
-description: "Use when adding, editing, or running tests and linters in this project. Covers Ruff, Pylint, yamllint, actionlint, and Shopify theme-check invoke task conventions."
-applyTo: "tasks/tests.py"
+applyTo: "**/*.py,**/*.yml,**/*.yaml"
 ---
-# Tests Instructions
+# Testing Instructions
 
-## Test Tooling
-| Tool | Covers | Run With |
-|------|--------|----------|
-| Ruff | Python style & lint | `uv run --no-sync invoke tests.rufflint` |
-| Pylint | Python deep static analysis | `uv run --no-sync invoke tests.pylint` |
-| theme-check | Shopify theme lint | `uv run --no-sync invoke tests.theme_check` |
-| yamllint | YAML files | `uv run --no-sync invoke tests.yamllint` |
-| actionlint | GitHub Actions workflows | `uv run --no-sync invoke tests.actionlint` |
+## Golden Rule
 
-## Running Tests
-```sh
-uv run --no-sync invoke test               # All: ruff + pylint + theme-check + yamllint + actionlint
-uv run --no-sync invoke fix                # Auto-correct: ruff --fix + ruff format + theme-check --auto-correct
+**IF YOU CHANGE `.py`, `.yml`, or `.yaml` FILES — YOU MUST GET 10/10 ON TESTS.**
+
+No exceptions. No shortcuts.
+
+## Workflow
+
+```bash
+# 1. Auto-fix first (ALWAYS do this before testing)
+uv run --no-sync invoke fix
+
+# 2. Run tests
+uv run --no-sync invoke test
+# Required: 10/10 score, exit code 0
 ```
 
-## File Structure
+## Canonical Commands (Use These Exactly)
+
+```bash
+# Full fix + full test
+uv run --no-sync invoke fix
+uv run --no-sync invoke test
+
+# Targeted test tasks
+uv run --no-sync invoke tests.actionlint
+uv run --no-sync invoke tests.pylint
+uv run --no-sync invoke tests.rufflint
+uv run --no-sync invoke tests.yamllint
+
+# Targeted formatting/fix tasks
+uv run --no-sync invoke ruff.fix
+uv run --no-sync invoke ruff.format
 ```
-tasks/
-  tests.py      # tests.rufflint, tests.pylint, tests.theme_check, tests.yamllint, tests.actionlint
-  ruff.py       # ruff.fix, ruff.format
-  shopify.py    # shopify.fix (theme-check --auto-correct), shopify.pull, shopify.upgrade, shopify.env
-  combos.py     # top-level test/fix aliases
+
+Do not run `uv run invoke ...` without `--no-sync`.
+
+## When to Run Tests
+
+Run tests if you modified:
+- `*.py` — any Python file (pylint + ruff)
+- `*.yml` or `*.yaml` — any YAML file (yamllint)
+- `.github/workflows/*.yml` — GitHub Actions (actionlint + yamllint)
+
+Skip tests for: `*.md`, config files, `*.toml`, `*.json`
+
+## What Gets Tested
+
+1. **actionlint** — GitHub Actions workflow validation
+2. **pylint** — Python code quality
+3. **ruff** — Python linting and formatting
+4. **yamllint** — YAML file validation
+
+## Fix Issues — Never Disable Warnings
+
+```python
+# ❌ WRONG — never do this without asking user first
+except Exception:  # pylint: disable=broad-exception-caught
+    pass
+
+# ✅ CORRECT — catch specific exceptions
+except (ValueError, KeyError) as e:
+    cli.echo(f"Error: {e}")
 ```
 
-## Adding a New Test Task
-1. Add a function to `tasks/tests.py` (or a new dedicated module for a distinct tool)
-2. Wire the new module into `tasks/__init__.py` if it's a new file
-3. Add the task call to the `test` (or `fix`) function in `tasks/combos.py`
-
-## Ruff & Pylint
-- Config lives in `pyproject.toml` under `[tool.ruff]` and `[tool.pylint]`
-- Pylint must score 10.00/10 to pass `invoke test`
-- Autocorrect: `uv run --no-sync invoke ruff.fix` then `uv run --no-sync invoke ruff.format`
-
-## theme-check
-- Lints Shopify theme files (`assets/`, `sections/`, `snippets/`, `templates/`, etc.)
-- Runs via the Shopify CLI (no Ruby/gem dependency): `shopify theme check`
-- Auto-correct: `shopify theme check --auto-correct`
-- Config: `.theme-check.yml` at project root (if present)
-
-## yamllint
-- Config lives in `.yamllint` at project root
-- Runs: `yamllint -c .yamllint .`
-
-## actionlint
-- Lints GitHub Actions workflow files under `.github/workflows/`
-- Installed via the `actionlint-py` pip dependency (no Homebrew required)
-- Runs: `actionlint`
-
+If an issue is too complex to fix:
+1. Try to fix it properly first
+2. Ask the user — explain what the linter says and what you've tried
+3. Wait for user approval before adding any exclusion

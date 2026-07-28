@@ -1,14 +1,30 @@
-"""Pull updates from git remote (stash → pull --rebase → restore)."""
+"""Pull updates from git remote."""
 
 import subprocess
-from pathlib import Path
 
 from ..common import cli as click
 from ..common.properties import get_repo_local
 from ..common.utils import error, success, warning
 
 
-def _stash_if_needed(repo_path: Path) -> bool:
+def _restore_stash(repo_path, *, on_failure: str) -> bool:
+    """Restore stashed changes and report outcome."""
+    pop_result = subprocess.run(
+        ["git", "stash", "pop"],
+        cwd=repo_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if pop_result.returncode != 0:
+        click.echo(pop_result.stderr.strip())
+        warning(on_failure)
+        return False
+    success("Stashed changes restored")
+    return True
+
+
+def _stash_if_needed(repo_path) -> bool:
     """Stash local changes if the working tree is dirty."""
     click.echo("🔍 Checking working directory status...")
     result = subprocess.run(
@@ -34,59 +50,56 @@ def _stash_if_needed(repo_path: Path) -> bool:
     )
     if stash_result.returncode != 0:
         click.echo(stash_result.stderr.strip())
-        error("Failed to stash changes.")
+        error("Failed to stash changes.", exit_code=1)
 
     success("Changes stashed")
     click.echo()
     return True
 
 
-def _restore_stash(repo_path: Path) -> None:
-    """Restore stashed changes after pull."""
-    click.echo("📂 Restoring stashed changes...")
-    pop_result = subprocess.run(
-        ["git", "stash", "pop"],
-        cwd=repo_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if pop_result.returncode != 0:
-        click.echo(pop_result.stderr.strip())
-        warning("Stash pop had conflicts — resolve manually, then: git stash drop")
-        return
-    success("Stashed changes restored")
-
-
-def _pull_rebase(repo_path: Path) -> None:
-    """Pull from remote with --rebase."""
-    click.echo("📥 Pulling latest changes from remote (--rebase)...")
-    result = subprocess.run(
-        ["git", "pull", "--rebase"],
-        cwd=repo_path,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if result.stdout:
-        click.echo(result.stdout.strip())
-    if result.returncode != 0:
-        click.echo(result.stderr.strip())
-        error("Git pull --rebase failed. Resolve conflicts then run: git rebase --continue")
-    success("Pull completed")
-
-
+@click.command()
 def main() -> None:
-    """Pull updates from git remote (stash → pull --rebase → restore)."""
+    """
+    Pull updates from git remote.
+
+    Steps:
+    1. Check working directory and stash local changes if needed
+    2. Pull latest changes from git remote
+        - Uses rebase to handle divergent local/remote history
+    3. Restore stashed changes, if any
+    """
     repo_path = get_repo_local()
 
+    click.echo("📥 Starting pull from remote...")
+    click.echo()
+
     stashed = _stash_if_needed(repo_path)
-    _pull_rebase(repo_path)
+
+    click.echo("📥 Pulling latest changes from git remote...")
+    try:
+        subprocess.run(["git", "pull", "--rebase"], cwd=repo_path, check=True)
+        success("Git pull completed")
+    except subprocess.CalledProcessError:
+        if stashed:
+            click.echo()
+            click.echo("📦 Restoring stashed changes after pull failure...")
+            _restore_stash(
+                repo_path,
+                on_failure="Stash pop failed — your changes are still in the stash. Run: git stash pop",
+            )
+        error("Git pull failed. Check network or merge conflicts.", exit_code=1)
 
     if stashed:
         click.echo()
-        _restore_stash(repo_path)
+        click.echo("📦 Restoring stashed changes...")
+        _restore_stash(
+            repo_path,
+            on_failure="Stash pop failed — your changes are still in the stash. Run: git stash pop",
+        )
+
+    click.echo()
+    click.echo("🎉 Pull completed!")
 
 
 if __name__ == "__main__":
-    main()
+    main()  # pylint: disable=no-value-for-parameter
