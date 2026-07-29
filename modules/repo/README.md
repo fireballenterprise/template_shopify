@@ -2,7 +2,7 @@
 
 Git workflow and Pull Request automation — pull, push, rebase, squash, session logs, and PR
 creation. Shared logic used by both `invoke repo.*` tasks and the `/repo`, `/push`, `/pull`,
-`/rebase`, `/squash`, `/pr`, `/pr-notes` slash commands.
+`/rebase`, `/squash`, `/pr`, `/pr-notes`, `/pr-cleanup` slash commands.
 
 ## Usage
 
@@ -15,11 +15,13 @@ uv run --no-sync invoke repo.rebase        # Rebase onto remote default branch (
 uv run --no-sync invoke repo.pr_diff       # Print current branch's commit log/diff vs. its base branch
 uv run --no-sync invoke repo.pr_notes_save # Save PR notes to tmp/pull_requests/ (--content=...)
 uv run --no-sync invoke repo.pr_create     # Open a GitHub PR via gh (--title=... --content=...)
+uv run --no-sync invoke repo.pr_cleanup    # Switch to the default branch, pull, and delete the merged local feature branch
 ```
 
 `/repo <subcommand> [args]` (`modules/repo/route.py`) is the AI-facing entrypoint for the same
 functions — `/repo push`, `/repo pull`, `/repo pr_diff`, `/repo pr_notes`, `/repo pr_create`,
-`/repo rebase`, `/repo squash`. `/push` and `/pull` are direct aliases for `/repo push`/`/repo pull`.
+`/repo pr_cleanup`, `/repo rebase`, `/repo squash`. `/push` and `/pull` are direct aliases for
+`/repo push`/`/repo pull`.
 
 ## Files
 
@@ -35,9 +37,12 @@ functions — `/repo push`, `/repo pull`, `/repo pr_diff`, `/repo pr_notes`, `/r
   resolution if restoring the stash conflicts
 - `pr_diff.py` — detects the current branch's base/default branch and prints its commit log + diff
   vs. that base, for use when drafting a PR description. Exposes `PROTECTED_BRANCHES` and
-  `current_branch()`/`detect_base_branch()`, shared by `push.py`, `pr_notes.py`, and `pr_create.py`
+  `current_branch()`/`detect_base_branch()`, shared by `push.py`, `pr_notes.py`, `pr_create.py`, and
+  `pr_cleanup.py`
 - `pr_notes.py` — saves drafted PR notes markdown to `tmp/pull_requests/`
 - `pr_create.py` — opens a GitHub Pull Request for the current branch via `gh pr create`; reports
   the existing PR's URL instead of erroring if one is already open
+- `pr_cleanup.py` — after a PR is merged on GitHub: confirms the merge via `gh pr view`, switches to
+  the detected default branch, pulls, then force-deletes the local feature branch
 - `route.py` — `/repo <subcommand> [args]` argument dispatch, used by the AI-facing `/repo` command
 - `README.md` — this file
