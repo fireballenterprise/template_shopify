@@ -1,29 +1,28 @@
 # Common Utilities Module
 
-Shared utilities and helper functions used across all modules in the template_python repository.
+Shared utilities and helper functions used across all modules in the template_shopify repository.
 
 ## Overview
 
 This module provides common functionality that is used by other modules throughout the repository, including configuration parsing and utility functions.
 
-## Modules
+## Files
 
-### `utils.py`
-
-Common utility functions for console output, error handling, and shared operations.
-
-**Functions:**
-- `success(message)` - Print success messages with ✅ emoji
-- `error(message)` - Print error messages with ❌ emoji  
-- `warning(message)` - Print warning messages with ⚠️ emoji
-- `info(message)` - Print info messages with ℹ️ emoji
+- `utils.py` — console output helpers: `success()`, `error()`, `warning()`, `info()` (✅/❌/⚠️/ℹ️
+  prefixed), plus `create_slug()`
+- `properties.py` — reads `properties.yml`: `get_repo_root()`, `get_repo_local()`,
+  `get_repo_remote()`, `get_template_local()`, `get_template_remote()`
+- `cli.py` — Click-like CLI compatibility helpers backed by `argparse` (`echo`, `secho`, `prompt`,
+  `confirm`, `is_tty`, `Choice`, `command`/`option` decorators) — TUI-safe, no external dependency
+- `route_utils.py` — shared helpers for the `/repo`- and `/template`-style AI-tool command
+  routers: `find_repo_root()` (walks upward for `properties.yml`), `build_env()`
+- `README.md` — this file
 
 ## Dependencies
 
 This module depends on:
-- `common.properties` - For reading configuration from `properties.yml`
-- Standard library: `pathlib`, `shutil`
-- Internal CLI helper: `modules/common/cli.py` (TUI-safe prompt/confirm/option handling)
+- Standard library: `pathlib`, `argparse`, `subprocess`
+- `pyyaml` — for reading `properties.yml`
 
 ## Architecture
 
