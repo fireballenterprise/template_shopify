@@ -15,6 +15,7 @@ def fix(context):
 def test(context):
     """Run All Tests"""
     tests.actionlint(context)
+    tests.check_agents(context)
     tests.pylint(context)
     tests.rufflint(context)
     tests.theme_check(context)

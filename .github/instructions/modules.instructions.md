@@ -14,6 +14,7 @@ Modules provide reusable Python logic consumed by invoke tasks, prompts, and scr
 | `modules/repo/` | Git/PR workflow logic (pull, push, log, squash, rebase, pr) |
 | `modules/setup/` | Repo bootstrap logic called by `setup.sh`/`setup.ps1` (`properties.py`) |
 | `modules/template/` | Syncs shared, generic tooling with the parent template repo for `/template` |
+| `modules/tests/` | Repo consistency checks called by `tasks/tests.py` (`check_agents.py`) |
 | `modules/versioning/` | Checks `pyproject.toml` deps and workflow action refs against latest releases, updates locks; bumps the repo's `VERSION` file for deploys/releases (`project.py`) |
 
 ## Module Conventions

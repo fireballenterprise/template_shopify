@@ -3,6 +3,7 @@
 from invoke import task
 
 from modules.repo import log as log_module
+from modules.repo import pr_cleanup as pr_cleanup_module
 from modules.repo import pr_create as pr_create_module
 from modules.repo import pr_diff as pr_diff_module
 from modules.repo import pr_notes as pr_notes_module
@@ -52,6 +53,12 @@ def pr_diff(_context):
 def pr_notes_save(_context, content=None):
     """Save PR notes to tmp/pull_requests/"""
     pr_notes_module.main(content=content)
+
+
+@task
+def pr_cleanup(_context):
+    """Switch to the default branch, pull, and delete the merged local feature branch"""
+    pr_cleanup_module.main()
 
 
 @task

@@ -156,6 +156,7 @@ Python function receives: pattern="wire_tunnels"
 /repo pull             → modules.repo.route → modules.repo.pull
 /rebase                → invoke repo.rebase → modules.repo.rebase
 /squash                → invoke repo.squash → modules.repo.squash
+/pr-cleanup            → invoke repo.pr_cleanup → modules.repo.pr_cleanup
 /push (alias)          → /repo push
 /pull (alias)          → /repo pull
 ```
