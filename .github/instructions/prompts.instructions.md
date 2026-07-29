@@ -1,14 +1,15 @@
 ---
 description: "Use when creating or editing slash-command prompt files for this project. Covers prompt structure, frontmatter, naming, the four-way sync across .github/prompts/, .claude/commands/, .claude/skills/, and .clinerules/workflows/, and how prompts interact with invoke tasks and modules."
-applyTo: ".github/prompts/**,.claude/commands/**,.claude/skills/**,.clinerules/workflows/**"
+applyTo: ".github/prompts/**,.claude/commands/**,.clinerules/workflows/**"
 ---
 # Prompts Instructions
 
 ## Location & Source of Truth
 `.github/prompts/*.prompt.md` is the **source of truth** for every slash command. It's mirrored
 into `.claude/commands/*.md` (Claude Code slash commands), `.claude/skills/*/SKILL.md` (Claude
-Code Skills — auto-discovered, not explicitly invoked), and `.clinerules/workflows/*.md` (Cline)
-— see Required Frontmatter and Command Body below for each tool's format.
+Code Skills — auto-discovered, not explicitly invoked, format documented in
+`skills.instructions.md`), and `.clinerules/workflows/*.md` (Cline) — see Required Frontmatter and
+Command Body below for the commands/clinerules format.
 
 ## Architecture
 Commands are the AI-facing entrypoint layer described in `.github/instructions/logic.instructions.md`
@@ -46,21 +47,8 @@ Claude Code uses the filename as the command name. Extra frontmatter fields are 
 No frontmatter — Cline workflows are plain markdown body only. The filename (minus extension) is
 the command name.
 
-### Claude Code Skills (.claude/skills/*/SKILL.md)
-```yaml
----
-name: command_name
-description: Use for ... . Equivalent to /command_name.
----
-```
-One directory per command, named to match (`.claude/skills/push/SKILL.md` for `/push`). Unlike the
-other three tools, the body is a **pointer, not a mirror** — point at the `.github/prompts/*.prompt.md`
-file as source of truth and summarize the underlying command, rather than duplicating the full
-prompt body. See any existing `.claude/skills/*/SKILL.md` for the pattern.
-
-This uses the Agent Skills format (published as an open spec, in principle implementable by any
-tool), but treat it here as **Claude Code-specific** until other tools this repo targets
-demonstrably adopt it — hence living under `.claude/` rather than a vendor-neutral `.agents/`.
+Claude Code Skills (`.claude/skills/*/SKILL.md`) also mirror every command, and GitHub Copilot
+Skills (`.github/skills/*/SKILL.md`) optionally do — see `skills.instructions.md` for both formats.
 
 ## Command Body
 Claude Code and Copilot use the same inline-execution syntax:
@@ -118,7 +106,7 @@ uv run --no-sync python -m modules.your_module.route "$ARGUMENTS"
    ```
 3. Create command files in **all four tool dirs** (`.github/prompts/`, `.claude/commands/`,
    `.clinerules/workflows/` with the thin wrapper body, and `.claude/skills/<name>/SKILL.md` with a
-   pointer body) — see Command Body and Required Frontmatter above.
+   pointer body) — see Command Body above and `skills.instructions.md` for the SKILL.md format.
 4. Run `uv run --no-sync invoke fix && uv run --no-sync invoke test` (must be 10/10 for `.py` changes)
 
 **DO NOT:**
@@ -181,3 +169,4 @@ Python function receives: pattern="wire_tunnels"
 - Doc/AI-config drift after a prompt change: run `/docs` (see `docs.prompt.md`)
 - Branch naming and PR description format used by `pr.prompt.md`/`pr-notes.prompt.md` are defined
   once, canonically, in `git.instructions.md` — don't restate that structure in a new command
+- SKILL.md format for both `.claude/skills/` and `.github/skills/`: `skills.instructions.md`
