@@ -40,8 +40,9 @@ functions — `/repo push`, `/repo pull`, `/repo pr_diff`, `/repo pr_notes`, `/r
   `current_branch()`/`detect_base_branch()`, shared by `push.py`, `pr_notes.py`, `pr_create.py`, and
   `pr_cleanup.py`
 - `pr_notes.py` — saves drafted PR notes markdown to `tmp/pull_requests/`
-- `pr_create.py` — opens a GitHub Pull Request for the current branch via `gh pr create`; reports
-  the existing PR's URL instead of erroring if one is already open
+- `pr_create.py` — opens a GitHub Pull Request for the current branch via `gh pr create`, assigned
+  to the calling user (`--assignee @me`); reports the existing PR's URL instead of erroring if one
+  is already open
 - `pr_cleanup.py` — after a PR is merged on GitHub: confirms the merge via `gh pr view`, switches to
   the detected default branch, pulls, then force-deletes the local feature branch
 - `route.py` — `/repo <subcommand> [args]` argument dispatch, used by the AI-facing `/repo` command

@@ -15,5 +15,6 @@ uv run --no-sync invoke repo.pr_create --title="<title>" --content="<notes>"
 ```
 
 This drafts notes and opens the PR but does not push first — push separately (see the `push`
-skill) if the branch isn't already up to date on the remote. If a PR already exists for this
-branch, `repo.pr_create` reports its URL instead of erroring.
+skill) if the branch isn't already up to date on the remote. The PR is assigned to the calling
+user (`--assignee @me`). If a PR already exists for this branch, `repo.pr_create` reports its URL
+instead of erroring.

@@ -18,6 +18,7 @@ Then create the pull request:
 2. Draft a concise PR title (under 70 characters) summarizing the change.
 3. Run:
    `uv run --no-sync invoke repo.pr_create --title="<title>" --content="<notes>"`
+   (this also assigns the PR to the calling user via `--assignee @me`)
 4. Report the PR URL to the user.
 
 If a PR already exists for this branch, `repo.pr_create` reports its URL instead of erroring —
