@@ -24,23 +24,29 @@ def get_repo_root() -> Path:
         Path to repository root.
 
     Raises:
-        FileNotFoundError: If properties.yml cannot be found.
+        FileNotFoundError: If properties.yml cannot be found and no repository markers are found.
     """
     # Start from current file location
     current = Path(__file__).resolve()
 
-    # Search upward from current file location
+    # Search upward from current file location for a generated properties.yml first.
     for parent in [current.parent.parent.parent] + list(current.parents):
         props_file = parent / "properties.yml"
         if props_file.exists():
             return parent
 
-    # Also try from current working directory
+    # Also try from the current working directory.
     current_cwd = Path.cwd().resolve()
     for parent in [current_cwd] + list(current_cwd.parents):
         props_file = parent / "properties.yml"
         if props_file.exists():
             return parent
+
+    # In CI or fresh checkouts, properties.yml may not exist yet. Fall back to the
+    # current checkout root if repository markers are present.
+    for candidate in [current_cwd, current.parent.parent.parent, *current.parents]:
+        if (candidate / ".git").exists() or (candidate / "VERSION").exists():
+            return candidate
 
     msg = "Could not find repository root (properties.yml not found)"
     raise FileNotFoundError(msg)
