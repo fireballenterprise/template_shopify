@@ -1,5 +1,5 @@
 [project]
-name = "template-shopify-theme"
+name = "fireball_3d_shopify"
 version = "1.0.0"
 description = "Fireball Enterprise Shopify theme template — vendored Dawn, thin caller workflows, Python invoke tasks, reusable modules, and AI Copilot prompts."
 readme = "README.md"
@@ -21,8 +21,8 @@ dependencies = [
 packages = []
 
 [project.urls]
-homepage = "https://github.com/fireballenterprise/template_shopify"
-repository = "https://github.com/fireballenterprise/template_shopify"
+homepage = "https://github.com/fireballenterprise/fireball_3d_shopify"
+repository = "https://github.com/fireballenterprise/fireball_3d_shopify"
 
 [tool.ruff]
 line-length = 120

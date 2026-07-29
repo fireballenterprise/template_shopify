@@ -1,5 +1,5 @@
 # Online Store
-The main storefront at fireballenterprise.com — this repo's Dawn theme is the Online Store
+The main storefront at fireball3d.com — this repo's Dawn theme is the Online Store
 channel's theme.
 
 ## Channel Details
@@ -13,6 +13,6 @@ channel's theme.
 - All Fireball customizations tracked in `.github/instructions/fireball.instructions.md`
 
 ## Configuration
-- Themes: `production` (live, #180167016733) and `development` (unpublished, #180100432157)
-- Store domain: p9mkux-sd.myshopify.com → fireballenterprise.com
+- Themes: `production` (live, #180167010000) and `development` (unpublished, #180100430000)
+- Store domain: p9shde-sd.myshopify.com → fireball.com
 <!-- TODO: capture domain/DNS setup, checkout settings, preferences (SEO title, analytics IDs) -->

@@ -5,7 +5,7 @@ applyTo: "{assets,config,layout,locales,sections,snippets,templates}/**"
 # Shopify Instructions
 
 ## Theme Overview
-A fork of [Shopify Dawn](https://github.com/Shopify/dawn) customized for Fireball Enterprise (fireballenterprise.com). Dawn is Shopify's reference theme built on Online Store 2.0.
+A fork of [Shopify Dawn](https://github.com/Shopify/dawn) customized for Fireball Enterprise (fireball3d.com). Dawn is Shopify's reference theme built on Online Store 2.0.
 
 ## Shopify Theme Directories
 Only these directories are synced to Shopify via CLI — do not put Ruby tooling here:
