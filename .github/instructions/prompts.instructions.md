@@ -1,13 +1,14 @@
 ---
-description: "Use when creating or editing slash-command prompt files for this project. Covers prompt structure, frontmatter, naming, the three-way sync across .github/prompts/, .claude/commands/, and .clinerules/workflows/, and how prompts interact with invoke tasks and modules."
-applyTo: ".github/prompts/**,.claude/commands/**,.clinerules/workflows/**"
+description: "Use when creating or editing slash-command prompt files for this project. Covers prompt structure, frontmatter, naming, the four-way sync across .github/prompts/, .claude/commands/, .clinerules/workflows/, and .agents/skills/, and how prompts interact with invoke tasks and modules."
+applyTo: ".github/prompts/**,.claude/commands/**,.clinerules/workflows/**,.agents/skills/**"
 ---
 # Prompts Instructions
 
 ## Location & Source of Truth
 `.github/prompts/*.prompt.md` is the **source of truth** for every slash command. It's mirrored
-into `.claude/commands/*.md` (Claude Code) and `.clinerules/workflows/*.md` (Cline) — see Required
-Frontmatter and Command Body below for each tool's format.
+into `.claude/commands/*.md` (Claude Code), `.clinerules/workflows/*.md` (Cline), and
+`.agents/skills/*/SKILL.md` (generic Agent Skills spec) — see Required Frontmatter and Command Body
+below for each tool's format.
 
 ## Architecture
 Commands are the AI-facing entrypoint layer described in `.github/instructions/logic.instructions.md`
@@ -44,6 +45,18 @@ Claude Code uses the filename as the command name. Extra frontmatter fields are 
 ### Cline (.clinerules/workflows/*.md)
 No frontmatter — Cline workflows are plain markdown body only. The filename (minus extension) is
 the command name.
+
+### Agent Skills (.agents/skills/*/SKILL.md)
+```yaml
+---
+name: command_name
+description: Use for ... . Equivalent to /command_name.
+---
+```
+One directory per command, named to match (`.agents/skills/push/SKILL.md` for `/push`). Unlike the
+other three tools, the body is a **pointer, not a mirror** — point at the `.github/prompts/*.prompt.md`
+file as source of truth and summarize the underlying command, rather than duplicating the full
+prompt body. See any existing `.agents/skills/*/SKILL.md` for the pattern.
 
 ## Command Body
 Claude Code and Copilot use the same inline-execution syntax:
@@ -99,8 +112,9 @@ uv run --no-sync python -m modules.your_module.route "$ARGUMENTS"
    if __name__ == "__main__":
        raise SystemExit(main())
    ```
-3. Create command files in **all three tool dirs** (`.github/prompts/`, `.claude/commands/`,
-   `.clinerules/workflows/`) with the thin wrapper body — see Command Body above.
+3. Create command files in **all four tool dirs** (`.github/prompts/`, `.claude/commands/`,
+   `.clinerules/workflows/` with the thin wrapper body, and `.agents/skills/<name>/SKILL.md` with a
+   pointer body) — see Command Body and Required Frontmatter above.
 4. Run `uv run --no-sync invoke fix && uv run --no-sync invoke test` (must be 10/10 for `.py` changes)
 
 **DO NOT:**
