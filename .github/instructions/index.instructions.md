@@ -20,24 +20,25 @@ modules/
   setup/          # properties.py — creates/stamps properties.yml, called by setup.sh/setup.ps1
   shopify/        # deploy.py, env.py, pull.py, upgrade.py — Shopify CLI theme sync (not part of the shared template_python repo)
   template/       # ignore.py, naming.py, pull.py, push.py, resolve.py, route.py, scope.py — sync shared tooling with the parent template repo for /template
+  tests/          # check_agents.py — verify .github/prompts/ mirrors are in sync, called by tests.check_agents
   versioning/     # libs.py, python.py, workflows.py, upgrade.py, project.py — check pyproject.toml deps & workflow action refs vs. latest releases, bump the repo's VERSION file
 tasks/
   __init__.py     # Wires the invoke Collection (dawn, debug, repo, ruff, setup, shopify, template, tests, upgrade, uv, versioning) plus top-level aliases (fix, test, update)
   combos.py       # Top-level aliases: fix, test, update
   dawn.py         # dawn.list, dawn.version, dawn.upgrade
   debug.py        # debug.env — print cwd + sorted env vars
-  repo.py         # repo.pull, repo.push, repo.log, repo.squash, repo.rebase, repo.pr_diff, repo.pr_notes_save, repo.pr_create
+  repo.py         # repo.pull, repo.push, repo.log, repo.squash, repo.rebase, repo.pr_diff, repo.pr_notes_save, repo.pr_create, repo.pr_cleanup
   ruff.py         # ruff.fix, ruff.format
   setup.py        # setup.properties — creates/stamps properties.yml
   shopify.py      # shopify.deploy, shopify.env, shopify.fix, shopify.pull, shopify.upgrade
   template.py     # template.pull, template.pull_copy, template.push_diff, template.push_apply, template.push_create_pr
-  tests.py        # tests.actionlint, tests.pylint, tests.rufflint, tests.yamllint, tests.theme_check
+  tests.py        # tests.actionlint, tests.check_agents, tests.pylint, tests.rufflint, tests.yamllint, tests.theme_check
   upgrade.py      # upgrade (default), upgrade.python, upgrade.libs, upgrade.sync — installs; run ver.update first
   uv.py           # uv.upgrade_bin, uv.upgrade_libs
   versioning.py   # ver.libs, ver.python, ver.workflows, ver.all, ver.update, ver.upgrade, ver.project_bump_build, ver.project_bump_release
 .github/
   instructions/   # Copilot instruction files
-  prompts/        # Copilot prompt files (/push, /pull, /squash, /rebase, /fix, /test, /docs, /pr-notes, /pr, /punch-it-chewy, /template, /update, /upgrade, /repo, /setup) — source of truth for slash commands
+  prompts/        # Copilot prompt files (/push, /pull, /squash, /rebase, /fix, /test, /docs, /pr-notes, /pr, /pr-cleanup, /punch-it-chewy, /template, /update, /upgrade, /repo, /setup) — source of truth for slash commands
   workflows/      # tests.yml (reusable), feature_branches.yml, protected_branches.yml
 .claude/
   commands/       # Claude Code slash commands, hand-maintained mirror of .github/prompts/ (see prompts.instructions.md)
@@ -84,7 +85,7 @@ addons/
 ## Running Tasks
 ```sh
 uv run --no-sync invoke          # List all tasks (or: uv run --no-sync invoke -l)
-uv run --no-sync invoke test     # ruff + pylint + yamllint + actionlint
+uv run --no-sync invoke test     # ruff + pylint + yamllint + actionlint + check_agents + theme_check
 uv run --no-sync invoke fix      # Ruff autocorrect + format
 uv run --no-sync invoke repo.pull   # Pull from git remote (stash → pull --rebase → restore)
 uv run --no-sync invoke repo.push   # Push to git remote (fix → test → commit → push)
@@ -94,6 +95,7 @@ uv run --no-sync invoke repo.rebase # Rebase onto remote default branch (optiona
 uv run --no-sync invoke repo.pr_diff       # Print current branch's commit log/diff vs. its base branch
 uv run --no-sync invoke repo.pr_notes_save # Save PR notes to tmp/pull_requests/ (--content=...)
 uv run --no-sync invoke repo.pr_create     # Open a GitHub PR via gh (--title=... --content=...)
+uv run --no-sync invoke repo.pr_cleanup    # Switch to the default branch, pull, and delete the merged local feature branch
 uv run --no-sync invoke template.pull           # Resolve the parent template repo's local path for /template
 uv run --no-sync invoke template.pull_copy      # Clobber-copy tracked files from a local template repo into this project
 uv run --no-sync invoke template.push_diff      # Diff this repo's scoped tooling against the parent template repo

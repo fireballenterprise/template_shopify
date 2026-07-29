@@ -29,6 +29,7 @@ uv run --no-sync invoke test
 
 # Targeted test tasks
 uv run --no-sync invoke tests.actionlint
+uv run --no-sync invoke tests.check_agents
 uv run --no-sync invoke tests.pylint
 uv run --no-sync invoke tests.rufflint
 uv run --no-sync invoke tests.yamllint
@@ -46,15 +47,19 @@ Run tests if you modified:
 - `*.py` — any Python file (pylint + ruff)
 - `*.yml` or `*.yaml` — any YAML file (yamllint)
 - `.github/workflows/*.yml` — GitHub Actions (actionlint + yamllint)
+- `.github/prompts/`, `.claude/commands/`, `.claude/skills/`, `.clinerules/workflows/` — command mirror
+  consistency (check_agents)
 
-Skip tests for: `*.md`, config files, `*.toml`, `*.json`
+Skip tests for: `*.md` (except the command mirror dirs above), config files, `*.toml`, `*.json`
 
 ## What Gets Tested
 
 1. **actionlint** — GitHub Actions workflow validation
-2. **pylint** — Python code quality
-3. **ruff** — Python linting and formatting
-4. **yamllint** — YAML file validation
+2. **check_agents** — `.github/prompts/` is mirrored into `.claude/commands/`, `.claude/skills/`, and
+   `.clinerules/workflows/`
+3. **pylint** — Python code quality
+4. **ruff** — Python linting and formatting
+5. **yamllint** — YAML file validation
 
 ## Fix Issues — Never Disable Warnings
 

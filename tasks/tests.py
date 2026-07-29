@@ -2,6 +2,8 @@
 
 from invoke import task
 
+from modules.tests import check_agents as check_agents_module
+
 
 @task
 def actionlint(context):
@@ -10,6 +12,15 @@ def actionlint(context):
     print("Action Lint")
     print("------------\n")
     context.run("actionlint")
+
+
+@task
+def check_agents(_context):
+    """Verify .github/prompts/ is mirrored into .claude/commands/, .claude/skills/, and .clinerules/workflows/"""
+    print("\n------------")
+    print("Check Agents")
+    print("------------\n")
+    check_agents_module.main()
 
 
 @task
