@@ -10,7 +10,7 @@
 exclude:
   - template.ignore.yml
   - properties.yml
-  - properties.yml.example
+  - properties.example.yml
   - README.md
   - LICENSE
   - uv.lock
