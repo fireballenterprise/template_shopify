@@ -13,8 +13,8 @@ INCLUDE_DIRS = [
     ".github/instructions",
     ".github/prompts",
     ".claude/commands",
+    ".claude/skills",
     ".clinerules/workflows",
-    ".agents/skills",
 ]
 
 

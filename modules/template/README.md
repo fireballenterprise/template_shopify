@@ -73,7 +73,7 @@ resolution happens in the `/template` prompt itself, not here — see
 ## Push
 
 Proposes new generic improvements from this repo (in `modules/`, `.github/instructions/`,
-`.github/prompts/`, `.claude/commands/`, `.clinerules/workflows/`, `.agents/skills/`) into the
+`.github/prompts/`, `.claude/commands/`, `.claude/skills/`, `.clinerules/workflows/`) into the
 parent template repo as a pull request. Candidates come from `git ls-files` (so this repo's own
 `.gitignore` is already applied) filtered again by `template.ignore.yml` -- the same file `pull`
 uses, applied in reverse so project-specific content (business modules, personal-vault content,
