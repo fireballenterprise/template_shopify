@@ -38,8 +38,8 @@ exclude:
   - .claude/commands/shopify.md
   - .clinerules/workflows/dawn.md
   - .clinerules/workflows/shopify.md
-  - .agents/skills/dawn/
-  - .agents/skills/shopify/
+  - .claude/skills/dawn/
+  - .claude/skills/shopify/
   - .github/instructions/dawn.instructions.md
   - .github/instructions/fireball.instructions.md
   - .github/instructions/shopify.instructions.md

@@ -26,9 +26,9 @@ description: "Use when reviewing a pull request or code change in this repo — 
 - `.github/instructions/` is this repo's source of truth for all AI/agent rules — a PR that
   changes behavior without updating the relevant instruction file is incomplete, not just
   under-documented.
-- The three synced command dirs (`.github/prompts/`, `.claude/commands/`, `.clinerules/workflows/`)
-  must stay behaviorally identical — see `.github/instructions/prompts.instructions.md`. Flag a
-  PR that edits only one or two of the three.
+- The four synced command dirs (`.github/prompts/`, `.claude/commands/`, `.claude/skills/`,
+  `.clinerules/workflows/`) must stay behaviorally consistent — see
+  `.github/instructions/prompts.instructions.md`. Flag a PR that edits some but not all of the four.
 - Branch name and PR title/body should follow `.github/instructions/git.instructions.md` — flag a
   branch name that isn't lowercase `snake_case` ending in `_<github_username>`, or a PR body
   missing the `## Summary`/`## Changes` structure.

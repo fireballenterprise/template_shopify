@@ -18,9 +18,9 @@ check:
    references to removed/renamed modules, commands, tasks, or config keys.
 4. **`AGENTS.md` / `CLAUDE.md`** — thin pointer files; only need edits if the pointer chain itself
    changed (rare).
-5. **The three synced command dirs** — `.github/prompts/*.prompt.md` (source of truth),
-   `.claude/commands/*.md`, `.clinerules/workflows/*.md` — these must describe the same behavior;
-   if one changed, the other two need the matching edit (see
+5. **The four synced command dirs** — `.github/prompts/*.prompt.md` (source of truth),
+   `.claude/commands/*.md`, `.claude/skills/*/SKILL.md`, `.clinerules/workflows/*.md` — these must
+   describe the same behavior; if one changed, the other three need the matching edit (see
    `.github/instructions/prompts.instructions.md`).
 6. **`properties.yml.example`** and any other example/config file describing setup — if `setup.sh`,
    `setup.ps1`, or `modules/setup/properties.py` changed what gets generated.
