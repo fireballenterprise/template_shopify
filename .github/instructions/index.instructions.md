@@ -41,6 +41,10 @@ tasks/
   workflows/      # tests.yml (reusable), feature_branches.yml, protected_branches.yml
 .claude/
   commands/       # Claude Code slash commands, hand-maintained mirror of .github/prompts/ (see prompts.instructions.md)
+.clinerules/
+  workflows/      # Cline slash commands, hand-maintained mirror of .github/prompts/ (see prompts.instructions.md)
+.agents/
+  skills/         # Generic Agent Skills, hand-maintained mirror of .github/prompts/ (see prompts.instructions.md)
 .vscode/
   extensions.json # Recommended VS Code extensions
   settings.json   # Ruff formatter + Python interpreter settings
@@ -53,7 +57,8 @@ addons/
 - `modules/` are plain importable Python packages (`modules.common`, `modules.repo`, `modules.template`) — imported directly by `tasks/*.py`
 - Every `modules/repo/*.py` file exposes a `main()` entry point, runnable standalone via `python -m modules.repo.<name>`
 - `invoke.yml` sets `auto_dash_names: false` so task names keep underscores (e.g. `repo.pull`, not `repo.pull-dash`)
-- `.github/prompts/` is the source of truth for slash commands; `.claude/commands/` and `.clinerules/workflows/` mirror it by hand — see `prompts.instructions.md`
+- `.github/prompts/` is the source of truth for slash commands; `.claude/commands/`,
+  `.clinerules/workflows/`, and `.agents/skills/` mirror it by hand — see `prompts.instructions.md`
 - Always run `uv run --no-sync ...`, never bare `uv run ...` — without `--no-sync`, `uv run` re-resolves and may silently upgrade a dependency before the command runs. Any dependency change must go through an explicit `uv sync`/`uv lock` step that the user can review, not an implicit one buried inside a task run
 - `addons/<name>/` mirrors the root layout but is not usable from this repo's root — its files must
   be copied into a consuming repo's actual root (root-relative imports, `applyTo` globs, and task
