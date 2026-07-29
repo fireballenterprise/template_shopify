@@ -110,6 +110,7 @@ Delete its entrypoint file(s) only. `.github/instructions/` and `AGENTS.md` stay
 - `.github/instructions/tasks.instructions.md` — invoke task runner and Collection wiring (plain CLI automation, no AI)
 - `.github/instructions/versioning.instructions.md` — `modules/versioning/` package: VERSION bumps and dependency/action version checks
 - `.github/instructions/prompts.instructions.md` — AI custom prompts / slash command standards and templates
+- `.github/instructions/skills.instructions.md` — Agent Skill (SKILL.md) conventions for `.claude/skills/` and `.github/skills/`
 - `.github/instructions/git.instructions.md` — branch naming and Pull Request description conventions
 - `.github/instructions/review.instructions.md` — PR/code-review priorities
 - `.github/instructions/tests.instructions.md` — testing requirements and workflow

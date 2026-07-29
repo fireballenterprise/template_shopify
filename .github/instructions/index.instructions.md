@@ -6,6 +6,26 @@ description: "Use when working on overall project structure, conventions, depend
 ## Overview
 Python-based project using [Invoke](https://www.pyinvoke.org/) for task automation and [uv](https://docs.astral.sh/uv/) for dependency/environment management. Targets Python `>=3.14`.
 
+## Instruction Files
+Operational guidance for this repo is split into focused files under `.github/instructions/`, each
+scoped to one concern — load only the ones relevant to the task at hand:
+- `index.instructions.md` — this file: project structure, conventions, dependencies, setup (start here)
+- `logic.instructions.md` — AI decision architecture, modules/tasks/AI stack, provider hierarchy
+- `python.instructions.md` — Python version, style, module/logging/subprocess conventions
+- `modules.instructions.md` — Python module architecture and layout conventions
+- `tasks.instructions.md` — invoke task runner and Collection wiring (plain CLI automation, no AI)
+- `versioning.instructions.md` — `modules/versioning/` package: VERSION bumps and dependency/action version checks
+- `dawn.instructions.md` — upstream Shopify/dawn version listing and upgrade conventions
+- `shopify.instructions.md` — Shopify theme conventions
+- `fireball.instructions.md` — Fireball customization tracking
+- `prompts.instructions.md` — AI custom prompts / slash command standards and templates
+- `skills.instructions.md` — Agent Skill (SKILL.md) conventions for `.claude/skills/` and `.github/skills/`
+- `git.instructions.md` — branch naming and Pull Request description conventions
+- `review.instructions.md` — PR/code-review priorities
+- `tests.instructions.md` — testing requirements and workflow
+- `style.instructions.md` — Markdown style and alphabetical-ordering rules
+- `docs.instructions.md` — README and inline-comment conventions
+
 ## Project Structure
 ```
 pyproject.toml    # Dependencies, ruff/pylint config
