@@ -20,5 +20,5 @@ Write the description using the canonical `## Summary` / `## Changes` format fro
 uv run --no-sync invoke repo.pr_notes_save --content="<the notes>"
 ```
 
-If you're running as a step inside another command (e.g. `pr` or `punch-it-chewy`), don't save —
+If you're running as a step inside another command (e.g. `pr` or `ship-it`), don't save —
 just hold the composed notes for that command to use directly.

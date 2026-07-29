@@ -13,7 +13,7 @@ description: "Use when reviewing a pull request or code change in this repo — 
    constants/strings that should be defined once.
 3. **Docs kept in sync** — see `.github/instructions/docs.instructions.md`. If the diff touches a
    module, command, task, or config key, the matching `README.md` and `.github/instructions/*.md`
-   file must reflect it. This repo runs a `/docs` drift sweep before every `/punch-it-chewy` (see
+   file must reflect it. This repo runs a `/docs` drift sweep before every `/ship-it` (see
    `.github/prompts/docs.prompt.md`) — a PR that skipped it should still read as internally
    consistent.
 4. **Style compliance** — see `.github/instructions/style.instructions.md` (Markdown) and

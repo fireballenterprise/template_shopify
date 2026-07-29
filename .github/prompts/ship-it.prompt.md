@@ -1,9 +1,8 @@
 ---
+name: ship-it
 description: Run tests, audit docs for drift (/docs), push the current feature branch, then draft PR notes and open a Pull Request via gh.
-subtask: false
-agent: general
-slash_command: /punch-it-chewy
-allowed-tools: Bash(uv run --no-sync *)
+argument-hint: no arguments required
+agent: agent
 ---
 
 First, follow the `/test` steps to run all tests and linters, auto-fixing what can be fixed. Do not

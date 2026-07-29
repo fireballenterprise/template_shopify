@@ -1,11 +1,11 @@
 ---
-name: punch-it-chewy
-description: Use for the full ship workflow — test, audit docs for drift, push the current branch, then draft PR notes and open a Pull Request. Equivalent to /punch-it-chewy.
+name: ship-it
+description: Use for the full ship workflow — test, audit docs for drift, push the current branch, then draft PR notes and open a Pull Request. Equivalent to /ship-it.
 ---
 
-# Punch It Chewy Workflow
+# Ship It Workflow
 
-Use this file as source of truth: `.github/prompts/punch-it-chewy.prompt.md`
+Use this file as source of truth: `.github/prompts/ship-it.prompt.md`
 
 When the user asks to ship/finish a branch end-to-end, read that prompt file and follow it.
 
