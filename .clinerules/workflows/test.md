@@ -21,4 +21,5 @@ If any tests fail:
 - For Pylint offenses (must score 10.00/10): show the offending lines and ask the user how they would like to proceed.
 - For YAML lint failures: show the offending lines and ask the user how they would like to proceed.
 - For actionlint failures: show the offending workflow file and line, and ask the user how they would like to proceed.
+- For check_agents failures: show the missing or orphaned command mirror files and ask the user how they would like to proceed.
 - For any other failures: show the full error output and ask the user how they would like to approach fixing it.

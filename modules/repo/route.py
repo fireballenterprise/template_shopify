@@ -23,6 +23,7 @@ _SUBCOMMAND_MODULES = {
     "pr_diff": "modules.repo.pr_diff",
     "pr_notes": "modules.repo.pr_notes",
     "pr_create": "modules.repo.pr_create",
+    "pr_cleanup": "modules.repo.pr_cleanup",
     "rebase": "modules.repo.rebase",
     "squash": "modules.repo.squash",
 }

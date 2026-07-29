@@ -1,6 +1,6 @@
 ---
 name: test
-description: Use for running all tests and linters — ruff, pylint, yamllint, actionlint. Equivalent to /test.
+description: Use for running all tests and linters — ruff, pylint, yamllint, actionlint, check_agents. Equivalent to /test.
 ---
 
 # Test Workflow
