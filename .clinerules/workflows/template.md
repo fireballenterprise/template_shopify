@@ -68,7 +68,7 @@ this fork's own business or personal use.
 
 **Scope** (enforced by `modules/template/scope.py`, mirrored here for visibility):
 - Eligible directories: `modules/`, `.github/instructions/`, `.github/prompts/`,
-  `.claude/commands/`, `.clinerules/workflows/`, `.agents/skills/`.
+  `.claude/commands/`, `.claude/skills/`, `.clinerules/workflows/`.
 - Candidates come from `git ls-files`, so anything this repo's own `.gitignore` covers is already
   excluded — nothing hardcoded for that.
 - Also excluded: anything in this project's `template.ignore.yml` `exclude:` list — the same file

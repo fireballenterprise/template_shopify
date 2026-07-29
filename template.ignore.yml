@@ -36,11 +36,15 @@ exclude:
   # Shopify automation's
   - .claude/commands/dawn.md
   - .claude/commands/shopify.md
+  - .clinerules/workflows/dawn.md
+  - .clinerules/workflows/shopify.md
+  - .claude/skills/dawn/
+  - .claude/skills/shopify/
   - .github/instructions/dawn.instructions.md
   - .github/instructions/fireball.instructions.md
   - .github/instructions/shopify.instructions.md
-  - .github/prompts/dawn.prompts.md
-  - .github/prompts/shopify.prompts.md
+  - .github/prompts/dawn.prompt.md
+  - .github/prompts/shopify.prompt.md
   - .github/workflows/dawn_sync.yml
   - .github/workflows/deploy.yml
   - .github/workflows/publish_release.yml
