@@ -95,7 +95,7 @@ namespace.add_collection(my_new_module, name="my_new_module")
 | libs | `uv run --no-sync invoke upgrade.libs` | Upgrade libraries only |
 | python | `uv run --no-sync invoke upgrade.python` | Upgrade Python only |
 | sync | `uv run --no-sync invoke upgrade.sync` | Sync dependencies (no version check) |
-| upgrade | `uv run --no-sync invoke upgrade.upgrade` | Upgrade Python + all dependencies (default) |
+| upgrade | `uv run --no-sync invoke upgrade` | Upgrade Python + all dependencies (default; explicit form: `upgrade.all`) |
 
 ### Versioning Tasks
 Read-only version-lock *checks* — compare `pyproject.toml` deps and `.github/workflows/` action
@@ -116,7 +116,7 @@ module behavior behind these.
 | Fix code style | `uv run --no-sync invoke fix` |
 | Run all tests | `uv run --no-sync invoke test` |
 | Run one linter | `uv run --no-sync invoke tests.pylint` |
-| Upgrade everything | `uv run --no-sync invoke upgrade.upgrade` |
+| Upgrade everything | `uv run --no-sync invoke upgrade` |
 | Run a module | `uv run --no-sync python -m modules.chat.start --title="..."` |
 | Test a route | `uv run --no-sync python -m modules.chat.route "start my chat"` |
 

@@ -27,7 +27,21 @@ def main(title: str | None = None, content: str | None = None) -> None:
 
     click.echo(f"Creating PR: {branch} -> {base_name}")
     result = subprocess.run(
-        ["gh", "pr", "create", "--base", base_name, "--head", branch, "--title", title, "--body", content],
+        [
+            "gh",
+            "pr",
+            "create",
+            "--base",
+            base_name,
+            "--head",
+            branch,
+            "--title",
+            title,
+            "--body",
+            content,
+            "--assignee",
+            "@me",
+        ],
         cwd=repo_path,
         capture_output=True,
         text=True,
