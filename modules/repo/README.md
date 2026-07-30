@@ -1,6 +1,6 @@
 # Repo Module
 
-Git workflow and Pull Request automation — pull, push, rebase, squash, session logs, and PR
+Git workflow and Pull Request automation — pull, push, rebase, squash, and PR
 creation. Shared logic used by both `invoke repo.*` tasks and the `/repo`, `/push`, `/pull`,
 `/rebase`, `/squash`, `/pr`, `/pr-notes`, `/pr-cleanup` slash commands.
 
@@ -9,7 +9,6 @@ creation. Shared logic used by both `invoke repo.*` tasks and the `/repo`, `/pus
 ```sh
 uv run --no-sync invoke repo.pull          # Stash → pull --rebase → restore
 uv run --no-sync invoke repo.push          # Fix → test → commit → push (handles new feature branches too)
-uv run --no-sync invoke repo.log           # Save a session log to logs/
 uv run --no-sync invoke repo.squash        # Anchored squash of all commits to root + optional force push
 uv run --no-sync invoke repo.rebase        # Rebase onto remote default branch (optionally squash first)
 uv run --no-sync invoke repo.pr_diff       # Print current branch's commit log/diff vs. its base branch
@@ -29,7 +28,6 @@ functions — `/repo push`, `/repo pull`, `/repo pr_diff`, `/repo pr_notes`, `/r
   branch has no upstream yet) → restore stash → commit → push. Runs `invoke fix`/`invoke test`
   first and stops if tests don't pass. Used by `/push` and `invoke repo.push`
 - `pull.py` — stash → `git pull --rebase` → restore stash. Used by `/pull` and `invoke repo.pull`
-- `log.py` — saves a timestamped session log markdown file to `logs/`
 - `squash.py` — anchored squash of every commit down to the repo's root commit into one, with an
   auto-generated bulleted message; optional `--force-with-lease` push
 - `rebase.py` — rebases the current branch onto the remote default branch (`origin/main` or

@@ -56,7 +56,7 @@ def main() -> None:
 | `properties.py` | Read `properties.yml` — `get_repo_local()`, `get_repo_remote()`, `get_template_local()`, `get_template_remote()`. Mirrors `template_python`'s copy exactly — don't add project-specific functions here |
 | `route_utils.py` | AI-tool command routers (`modules/*/route.py`) — `find_repo_root()` (`properties.yml`-anchored, falls back to `cwd()`, no exception), `build_env()`. Mirrors `template_python`'s copy exactly |
 | `shopify.py` | Shopify store/theme config, not part of `template_python` — `get_shopify_store()`, `get_shopify_theme_id()`, `is_ci()` |
-| `utils.py` | `success()`, `error()`, `warning()`, `info()`, `create_slug()` |
+| `utils.py` | `success()`, `error()`, `warning()`, `info()` |
 
 ## Guidelines
 - Keep functions focused and single-purpose; extract private helpers instead of writing long functions
