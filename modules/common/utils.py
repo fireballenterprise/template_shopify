@@ -1,6 +1,5 @@
 """Common utilities for repo automation."""
 
-import re
 import sys
 from typing import NoReturn
 
@@ -24,22 +23,3 @@ def warning(message: str) -> None:
 def info(message: str) -> None:
     """Print info message with emoji prefix."""
     print(f"📂 {message}")
-
-
-def create_slug(text: str) -> str:
-    """
-    Convert text to a URL/filename-safe slug.
-
-    Lowercases the text, strips characters that are not alphanumeric, hyphens,
-    or spaces, then collapses whitespace runs into single underscores.
-
-    Args:
-        text: The input string to slugify.
-
-    Returns:
-        A lowercase slug with spaces replaced by underscores.
-    """
-    text = text.lower()
-    text = re.sub(r"[^\w\s-]", "", text)
-    text = re.sub(r"\s+", "_", text.strip())
-    return text
