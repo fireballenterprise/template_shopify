@@ -17,6 +17,6 @@ uv run --no-sync invoke repo.pr_diff
 ```
 
 Then sweep every doc/AI-config surface the prompt lists (root `README.md`, module `README.md`s,
-`.github/instructions/*.md`, `AGENTS.md`/`CLAUDE.md`, the synced command dirs, `properties.yml.example`)
+`.github/instructions/*.md`, `AGENTS.md`/`CLAUDE.md`, the synced command dirs, `properties.example.yml`)
 and fix anything stale directly — this is a repo-local consistency sweep, so no confirmation is
 needed before editing.

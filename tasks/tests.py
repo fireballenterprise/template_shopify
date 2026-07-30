@@ -1,8 +1,6 @@
-"""Test tasks (ruff, pylint, yamllint, actionlint, Shopify theme-check)."""
+"""Test tasks (ruff, pylint, pytest, yamllint, actionlint, Shopify theme-check)."""
 
 from invoke import task
-
-from modules.tests import check_agents as check_agents_module
 
 
 @task
@@ -15,12 +13,12 @@ def actionlint(context):
 
 
 @task
-def check_agents(_context):
+def check_agents(context):
     """Verify .github/prompts/ is mirrored into .claude/commands/, .claude/skills/, and .clinerules/workflows/"""
     print("\n------------")
     print("Check Agents")
     print("------------\n")
-    check_agents_module.main()
+    context.run("pytest tests/test_check_agents.py")
 
 
 @task
@@ -30,6 +28,15 @@ def pylint(context):
     print("Pylint Lint")
     print("------------\n")
     context.run("pylint --verbose --rcfile=pyproject.toml .")
+
+
+@task
+def pytest(context):
+    """Run Pytest Unit Test Suite"""
+    print("\n------------")
+    print("Pytest")
+    print("------------\n")
+    context.run("pytest")
 
 
 @task

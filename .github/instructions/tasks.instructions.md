@@ -56,6 +56,7 @@ namespace.add_collection(my_new_module, name="my_new_module")
       tests.actionlint(context)
       tests.check_agents(context)
       tests.pylint(context)
+      tests.pytest(context)
       tests.rufflint(context)
       tests.yamllint(context)
   ```
@@ -71,14 +72,15 @@ namespace.add_collection(my_new_module, name="my_new_module")
 | Task | Command | Description |
 |------|---------|-------------|
 | Fix | `uv run --no-sync invoke fix` | Run all auto-fixes (ruff fix + format) |
-| Test | `uv run --no-sync invoke test` | Run all tests (actionlint + check_agents + pylint + ruff + theme_check + yamllint) |
+| Test | `uv run --no-sync invoke test` | Run all tests (actionlint + check_agents + pylint + pytest + ruff + theme_check + yamllint) |
 
 ### Test Tasks
 | Task | Command | Description |
 |------|---------|-------------|
 | actionlint | `uv run --no-sync invoke tests.actionlint` | GitHub Actions workflow validation |
-| check_agents | `uv run --no-sync invoke tests.check_agents` | Verify `.github/prompts/` is mirrored into `.claude/commands/`, `.claude/skills/`, and `.clinerules/workflows/` |
+| check_agents | `uv run --no-sync invoke tests.check_agents` | Verify `.github/prompts/` is mirrored into `.claude/commands/`, `.claude/skills/`, and `.clinerules/workflows/` (`pytest tests/test_check_agents.py`) |
 | pylint | `uv run --no-sync invoke tests.pylint` | Python code quality |
+| pytest | `uv run --no-sync invoke tests.pytest` | Python unit test suite (`tests/`) |
 | rufflint | `uv run --no-sync invoke tests.rufflint` | Python linting and formatting |
 | theme_check | `uv run --no-sync invoke tests.theme_check` | Shopify theme-check |
 | yamllint | `uv run --no-sync invoke tests.yamllint` | YAML file validation |

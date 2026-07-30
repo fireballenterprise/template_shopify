@@ -17,6 +17,7 @@ def test(context):
     tests.actionlint(context)
     tests.check_agents(context)
     tests.pylint(context)
+    tests.pytest(context)
     tests.rufflint(context)
     tests.theme_check(context)
     tests.yamllint(context)

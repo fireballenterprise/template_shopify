@@ -31,6 +31,7 @@ uv run --no-sync invoke test
 uv run --no-sync invoke tests.actionlint
 uv run --no-sync invoke tests.check_agents
 uv run --no-sync invoke tests.pylint
+uv run --no-sync invoke tests.pytest
 uv run --no-sync invoke tests.rufflint
 uv run --no-sync invoke tests.yamllint
 
@@ -44,7 +45,8 @@ Do not run `uv run invoke ...` without `--no-sync`.
 ## When to Run Tests
 
 Run tests if you modified:
-- `*.py` — any Python file (pylint + ruff)
+- `*.py` — any Python file (pylint + ruff); files under `tests/` are excluded from pylint/ruff and
+  checked by pytest instead
 - `*.yml` or `*.yaml` — any YAML file (yamllint)
 - `.github/workflows/*.yml` — GitHub Actions (actionlint + yamllint)
 - `.github/prompts/`, `.claude/commands/`, `.claude/skills/`, `.clinerules/workflows/` — command mirror
@@ -56,10 +58,11 @@ Skip tests for: `*.md` (except the command mirror dirs above), config files, `*.
 
 1. **actionlint** — GitHub Actions workflow validation
 2. **check_agents** — `.github/prompts/` is mirrored into `.claude/commands/`, `.claude/skills/`, and
-   `.clinerules/workflows/`
+   `.clinerules/workflows/` (a pytest test under `tests/test_check_agents.py`)
 3. **pylint** — Python code quality
-4. **ruff** — Python linting and formatting
-5. **yamllint** — YAML file validation
+4. **pytest** — Python unit test suite (`tests/`)
+5. **ruff** — Python linting and formatting
+6. **yamllint** — YAML file validation
 
 ## Fix Issues — Never Disable Warnings
 

@@ -28,11 +28,13 @@ scoped to one concern — load only the ones relevant to the task at hand:
 
 ## Project Structure
 ```
-pyproject.toml    # Dependencies, ruff/pylint config
+pyproject.toml    # Dependencies, ruff/pylint/pytest config
 invoke.yml        # Invoke config (auto_dash_names: false)
 setup.sh          # Shell-based setup script (uv venv + uv sync)
 properties.yml    # Project configuration (repo path/remote, template path/remote)
 template.ignore.yml # Extra paths /template pull must never overwrite, on top of its built-in safety excludes
+tests/
+  test_check_agents.py # Verify .github/prompts/ mirrors are in sync, called by tests.check_agents
 modules/
   common/         # cli.py, properties.py, utils.py, shopify.py, route_utils.py — shared helpers
   dawn/           # list.py, version.py, upgrade.py — list upstream Shopify/dawn tags, print the checked-out version, merge dawn_vanilla upgrades
@@ -40,7 +42,6 @@ modules/
   setup/          # properties.py — creates/stamps properties.yml, called by setup.sh/setup.ps1
   shopify/        # deploy.py, env.py, pull.py, upgrade.py — Shopify CLI theme sync (not part of the shared template_python repo)
   template/       # ignore.py, naming.py, pull.py, push.py, resolve.py, route.py, scope.py — sync shared tooling with the parent template repo for /template
-  tests/          # check_agents.py — verify .github/prompts/ mirrors are in sync, called by tests.check_agents
   versioning/     # libs.py, python.py, workflows.py, upgrade.py, project.py — check pyproject.toml deps & workflow action refs vs. latest releases, bump the repo's VERSION file
 tasks/
   __init__.py     # Wires the invoke Collection (dawn, debug, repo, ruff, setup, shopify, template, tests, upgrade, uv, versioning) plus top-level aliases (fix, test, update)
@@ -52,7 +53,7 @@ tasks/
   setup.py        # setup.properties — creates/stamps properties.yml
   shopify.py      # shopify.deploy, shopify.env, shopify.fix, shopify.pull, shopify.upgrade
   template.py     # template.pull, template.pull_copy, template.push_diff, template.push_apply, template.push_create_pr
-  tests.py        # tests.actionlint, tests.check_agents, tests.pylint, tests.rufflint, tests.yamllint, tests.theme_check
+  tests.py        # tests.actionlint, tests.check_agents, tests.pylint, tests.pytest, tests.rufflint, tests.yamllint, tests.theme_check
   upgrade.py      # upgrade (default), upgrade.python, upgrade.libs, upgrade.sync — installs; run ver.update first
   uv.py           # uv.upgrade_bin, uv.upgrade_libs
   versioning.py   # ver.libs, ver.python, ver.workflows, ver.all, ver.update, ver.upgrade, ver.project_bump_build, ver.project_bump_release
@@ -95,6 +96,7 @@ addons/
 - `invoke` — task runner
 - `ruff` — fast Python linter/formatter
 - `pylint` — deep static analysis (10/10 required to pass `invoke test`)
+- `pytest` / `pytest-cov` — unit tests (`tests/`, e.g. `test_check_agents.py`)
 - `yamllint` — YAML linting
 - `actionlint-py` — GitHub Actions workflow linting (pip-installed, no Homebrew required)
 - `pyyaml` — reads `properties.yml`
@@ -105,7 +107,7 @@ addons/
 ## Running Tasks
 ```sh
 uv run --no-sync invoke          # List all tasks (or: uv run --no-sync invoke -l)
-uv run --no-sync invoke test     # ruff + pylint + yamllint + actionlint + check_agents + theme_check
+uv run --no-sync invoke test     # ruff + pylint + pytest + yamllint + actionlint + check_agents + theme_check
 uv run --no-sync invoke fix      # Ruff autocorrect + format
 uv run --no-sync invoke repo.pull   # Pull from git remote (stash → pull --rebase → restore)
 uv run --no-sync invoke repo.push   # Push to git remote (fix → test → commit → push)
