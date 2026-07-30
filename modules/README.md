@@ -13,9 +13,11 @@ modules/
   repo/         # pull, push, log, squash, rebase (git workflow)
   shopify/      # pull, upgrade, env (Shopify theme workflow)
   template/     # sync shared, generic tooling with the parent template repo for /template
-  tests/        # verify .github/prompts/ mirrors are in sync, called by tasks/tests.py
   versioning/   # dependency locks, workflow action refs, and VERSION-file bumps (project.py)
 ```
+
+Repo-consistency checks (`check_agents`) live under root `tests/` as pytest tests, not here — see
+`../tests/test_check_agents.py` and `.github/instructions/tests.instructions.md`.
 
 ## Submodules
 
@@ -27,7 +29,6 @@ modules/
 | [`repo/`](repo/README.md) | Git workflow, session logging, squash, and rebase |
 | [`shopify/`](shopify/README.md) | Shopify CLI theme pull, Dawn upstream upgrade, and CLI env var workflow |
 | [`template/`](template/README.md) | Sync shared, generic tooling with the parent template repo for `/template` (pull + push) |
-| [`tests/`](tests/README.md) | Verify `.github/prompts/` is mirrored into `.claude/commands/`, `.claude/skills/`, and `.clinerules/workflows/` |
 | [`versioning/`](versioning/README.md) | Dependency lock and workflow action-ref checks; bump the root `VERSION` file for dev deploys and releases |
 
 ## Conventions

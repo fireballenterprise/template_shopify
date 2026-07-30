@@ -11,6 +11,8 @@ dependencies = [
     "actionlint-py~=1.7.12.24",
     "invoke~=3.0.3",
     "pylint~=4.0.6",
+    "pytest~=9.1.1",
+    "pytest-cov~=7.1.0",
     "pyyaml~=6.0.3",
     "ruff~=0.15.20",
     "tomlkit~=0.15.0",
@@ -27,6 +29,7 @@ repository = "https://github.com/fireballenterprise/template_shopify"
 [tool.ruff]
 line-length = 120
 target-version = "py314"
+extend-exclude = ["tests/*"]
 
 [tool.ruff.lint]
 select = ["PL", "E", "W", "F", "I", "B", "A", "C4", "N", "UP", "T10", "EXE", "COM819", "C", "Q"]
@@ -54,6 +57,10 @@ line-ending = "auto"
 docstring-code-format = false
 docstring-code-line-length = "dynamic"
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = ["tmp", ".venv", ".ruff_cache", "__pycache__"]
+
 [tool.pylint.main]
 py-version = "3.14"
 fail-under = 10
@@ -65,6 +72,7 @@ ignore-paths = [
   "^.ruff_cache/.*$",
   "^tmp/.*$",
   ".*__pycache__.*$",
+  "^tests/.*$",
 ]
 
 [tool.pylint.format]
