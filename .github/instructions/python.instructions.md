@@ -9,7 +9,10 @@ Target: `>=3.14` (defined in `pyproject.toml`, pinned in `.python-version`)
 
 ## Style & Linting
 - **Ruff** enforces fast style/lint checks — run `uv run --no-sync invoke tests.rufflint` to check, `uv run --no-sync invoke ruff.fix` to auto-correct
-- **Pylint** enforces deeper static analysis — run `uv run --no-sync invoke tests.pylint` (must score 10.00/10 to pass `invoke test`)
+- **Pylint** is scoped to just `no-member` — the one check Ruff can't do (real type inference across installed
+  deps to catch attribute/method access that doesn't exist on the inferred type). Everything else Pylint could
+  flag is left to Ruff to avoid duplicate linting. Run `uv run --no-sync invoke tests.pylint` (must score 10.00/10
+  to pass `invoke test` — see `[tool.pylint.messages_control]` in `pyproject.toml`)
 - Run `uv run --no-sync invoke fix` to auto-correct everything Ruff can fix, then format
 - Config lives in `pyproject.toml` under `[tool.ruff]` and `[tool.pylint]`
 - Disable a rule inline only when necessary, with a comment explaining why:
