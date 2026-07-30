@@ -1,8 +1,7 @@
-"""Git workflow tasks (pull, push, log, squash, rebase, pr)."""
+"""Git workflow tasks (pull, push, squash, rebase, pr)."""
 
 from invoke import task
 
-from modules.repo import log as log_module
 from modules.repo import pr_cleanup as pr_cleanup_module
 from modules.repo import pr_create as pr_create_module
 from modules.repo import pr_diff as pr_diff_module
@@ -23,12 +22,6 @@ def pull(_context):
 def push(_context):
     """Push to git remote (fix → test → commit → push)"""
     push_module.main(no_confirm=True)
-
-
-@task
-def log(_context, title=None, content=None):
-    """Save a session log to logs/"""
-    log_module.main(title=title, content=content)
 
 
 @task

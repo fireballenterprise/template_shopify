@@ -9,7 +9,7 @@ This module provides common functionality that is used by other modules througho
 ## Files
 
 - `utils.py` — console output helpers: `success()`, `error()`, `warning()`, `info()` (✅/❌/⚠️/ℹ️
-  prefixed), plus `create_slug()`
+  prefixed)
 - `properties.py` — reads `properties.yml`: `get_repo_root()`, `get_repo_local()`,
   `get_repo_remote()`, `get_template_local()`, `get_template_remote()`
 - `cli.py` — Click-like CLI compatibility helpers backed by `argparse` (`echo`, `secho`, `prompt`,

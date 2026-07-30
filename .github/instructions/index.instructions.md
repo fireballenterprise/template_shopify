@@ -38,7 +38,7 @@ tests/
 modules/
   common/         # cli.py, properties.py, utils.py, shopify.py, route_utils.py — shared helpers
   dawn/           # list.py, version.py, upgrade.py — list upstream Shopify/dawn tags, print the checked-out version, merge dawn_vanilla upgrades
-  repo/           # pull.py, push.py, log.py, squash.py, rebase.py, pr_*.py, route.py — git/PR workflow modules
+  repo/           # pull.py, push.py, squash.py, rebase.py, pr_*.py, route.py — git/PR workflow modules
   setup/          # properties.py — creates/stamps properties.yml, called by setup.sh/setup.ps1
   shopify/        # deploy.py, env.py, pull.py, upgrade.py — Shopify CLI theme sync (not part of the shared template_python repo)
   template/       # ignore.py, naming.py, pull.py, push.py, resolve.py, route.py, scope.py — sync shared tooling with the parent template repo for /template
@@ -48,7 +48,7 @@ tasks/
   combos.py       # Top-level aliases: fix, test, update
   dawn.py         # dawn.list, dawn.version, dawn.upgrade
   debug.py        # debug.env — print cwd + sorted env vars
-  repo.py         # repo.pull, repo.push, repo.log, repo.squash, repo.rebase, repo.pr_diff, repo.pr_notes_save, repo.pr_create, repo.pr_cleanup
+  repo.py         # repo.pull, repo.push, repo.squash, repo.rebase, repo.pr_diff, repo.pr_notes_save, repo.pr_create, repo.pr_cleanup
   ruff.py         # ruff.fix, ruff.format
   setup.py        # setup.properties — creates/stamps properties.yml
   shopify.py      # shopify.deploy, shopify.env, shopify.fix, shopify.pull, shopify.upgrade
@@ -111,7 +111,6 @@ uv run --no-sync invoke test     # ruff + pylint + pytest + yamllint + actionlin
 uv run --no-sync invoke fix      # Ruff autocorrect + format
 uv run --no-sync invoke repo.pull   # Pull from git remote (stash → pull --rebase → restore)
 uv run --no-sync invoke repo.push   # Push to git remote (fix → test → commit → push)
-uv run --no-sync invoke repo.log    # Save a session log to logs/
 uv run --no-sync invoke repo.squash # Anchored squash all commits to root + optional force push
 uv run --no-sync invoke repo.rebase # Rebase onto remote default branch (optionally squash first)
 uv run --no-sync invoke repo.pr_diff       # Print current branch's commit log/diff vs. its base branch
