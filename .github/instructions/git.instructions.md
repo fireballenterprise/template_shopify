@@ -20,3 +20,8 @@ description: "Use when creating a git branch or drafting a Pull Request for this
 This is the canonical PR format for this repo — `.github/prompts/pr.prompt.md` and
 `pr-notes.prompt.md` (and their `.claude/commands/`/`.clinerules/workflows/` mirrors) implement it;
 see `prompts.instructions.md` for how those commands are kept in sync.
+
+## Pull Request Assignee
+Always assign the PR to the user who asked for it — `gh pr create --assignee @me` (the currently
+authenticated `gh` user). `modules/repo/pr_create.py` does this automatically; if you ever create a
+PR by hand (not through that module), pass `--assignee @me` yourself.

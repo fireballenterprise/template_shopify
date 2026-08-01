@@ -14,6 +14,7 @@ Before working in this repo, read the relevant files in `.github/instructions/`:
 - **Upstream Dawn version listing & upgrades**: `.github/instructions/dawn.instructions.md`
 - **Markdown style**: `.github/instructions/style.instructions.md`
 - **Docs**: `.github/instructions/docs.instructions.md`
+- **`properties.yml`'s `repos`/lineage key**: `.github/instructions/repos.instructions.md`
 - **Prompt files**: `.github/instructions/prompts.instructions.md`
 - **Agent Skills (SKILL.md)**: `.github/instructions/skills.instructions.md`
 - **Git branches & PR descriptions**: `.github/instructions/git.instructions.md`
