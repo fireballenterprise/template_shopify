@@ -25,8 +25,9 @@ check:
    `.claude/commands/*.md`, `.claude/skills/*/SKILL.md`, `.clinerules/workflows/*.md` — these must
    describe the same behavior; if one changed, the other three need the matching edit (see
    `.github/instructions/prompts.instructions.md`).
-6. **`properties.example.yml`** and any other example/config file describing setup — if `setup.sh`,
-   `setup.ps1`, or `modules/setup/properties.py` changed what gets generated.
+6. **`properties.yml`'s built-in template fragments** (`modules/setup/templates/properties/*.yml`) and
+   any other example/config file describing setup — if `setup.sh`, `setup.ps1`, or
+   `modules/setup/properties.py` changed what gets generated.
 7. Any other `*.md` file that references a file, command, module, or behavior touched by the diff.
 
 For each stale doc you find, fix it directly — this is a repo-local consistency sweep, not a

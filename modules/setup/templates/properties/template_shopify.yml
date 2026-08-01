@@ -1,0 +1,8 @@
+repos:
+  fireballenterprise:
+    - template_shopify
+  lineage:
+    fireballenterprise/template_shopify: LevonBecker/template_python
+
+shopify:
+  local_config: "tmp/.shopify/config.yml"

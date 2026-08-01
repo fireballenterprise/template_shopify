@@ -5,7 +5,45 @@ applyTo: "**"
 
 Rules for all markdown files created across this repository.
 
+## Horizontal Rules
+
+**Never use a standalone `---` line as a section divider in the body of a `.github/instructions/*.md`
+file.** The only place `---` belongs is the YAML frontmatter delimiter (the opening and closing
+`---` around `applyTo: "**"`) — never between headers. Headers and blank lines alone are enough
+visual separation.
+
+```markdown
+# ✅ CORRECT
 ---
+applyTo: "**"
+---
+# File Title
+Intro sentence.
+
+## Section One
+Content.
+
+## Section Two
+Content.
+```
+
+```markdown
+# ❌ WRONG
+---
+applyTo: "**"
+---
+# File Title
+
+---
+
+## Section One
+Content.
+
+---
+
+## Section Two
+Content.
+```
 
 ## Headers
 
