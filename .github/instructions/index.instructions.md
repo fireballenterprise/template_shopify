@@ -25,6 +25,7 @@ scoped to one concern — load only the ones relevant to the task at hand:
 - `tests.instructions.md` — testing requirements and workflow
 - `style.instructions.md` — Markdown style and alphabetical-ordering rules
 - `docs.instructions.md` — README and inline-comment conventions
+- `repos.instructions.md` — `properties.yml`'s `repos`/lineage key and the "related repos" trigger
 
 ## Project Structure
 ```
@@ -39,7 +40,7 @@ modules/
   common/         # cli.py, properties.py, utils.py, shopify.py, route_utils.py — shared helpers
   dawn/           # list.py, version.py, upgrade.py — list upstream Shopify/dawn tags, print the checked-out version, merge dawn_vanilla upgrades
   repo/           # pull.py, push.py, squash.py, rebase.py, pr_*.py, route.py — git/PR workflow modules
-  setup/          # properties.py — creates/stamps properties.yml, called by setup.sh/setup.ps1
+  setup/          # properties.py — creates properties.yml (no-op if it exists), called by setup.sh/setup.ps1; templates/properties/*.yml — tier fragments
   shopify/        # deploy.py, env.py, pull.py, upgrade.py — Shopify CLI theme sync (not part of the shared template_python repo)
   template/       # ignore.py, naming.py, pull.py, push.py, resolve.py, route.py, scope.py — sync shared tooling with the parent template repo for /template
   versioning/     # libs.py, python.py, workflows.py, upgrade.py, project.py — check pyproject.toml deps & workflow action refs vs. latest releases, bump the repo's VERSION file

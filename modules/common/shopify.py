@@ -25,11 +25,13 @@ def _expand_path(value: str) -> Path:
 def ensure_shopify_section() -> None:
     """Add the `shopify:` section to properties.yml if it's missing.
 
-    `modules/setup/properties.py`'s built-in template mirrors the shared template_python repo
-    wholesale on every `/template pull`, so it has no Shopify concept and thus no `shopify:`
-    section. Called as an extra `inv setup.properties` step (after the generic stamping) to
-    restore it, the same way Shopify-specific config reading lives here instead of in
-    `properties.py` — see `shopify.instructions.md`.
+    `modules/setup/properties.py` now bakes `shopify:` in from creation via
+    `modules/setup/templates/properties/template_shopify.yml` (a tier fragment this repo owns, not
+    touched by `/template` syncing the shared core), so this is a no-op for any `properties.yml`
+    created after that change. Kept as a migration safety net — called as an extra
+    `inv setup.properties` step (after the generic stamping) — for any `properties.yml` created
+    before it, which would otherwise never get the section restored (properties.py doesn't rewrite
+    an existing file). See `shopify.instructions.md`.
     """
     props_file = get_repo_root() / "properties.yml"
     if not props_file.is_file():

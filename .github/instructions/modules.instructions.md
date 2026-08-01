@@ -12,7 +12,7 @@ Modules provide reusable Python logic consumed by invoke tasks, prompts, and scr
 |------|---------|
 | `modules/common/` | Helpers tightly coupled to invoke tasks (`cli`, `properties`, `utils`); non-generic, project-specific helpers get their own file here (e.g. `shopify.py`) rather than living in `properties.py`, which mirrors the shared `template_python` repo verbatim for easy sync |
 | `modules/repo/` | Git/PR workflow logic (pull, push, log, squash, rebase, pr) |
-| `modules/setup/` | Repo bootstrap logic called by `setup.sh`/`setup.ps1` (`properties.py`) |
+| `modules/setup/` | Repo bootstrap logic called by `setup.sh`/`setup.ps1` (`properties.py`, no-op if `properties.yml` exists; `templates/properties/*.yml` tier fragments) |
 | `modules/template/` | Syncs shared, generic tooling with the parent template repo for `/template` |
 | `modules/versioning/` | Checks `pyproject.toml` deps and workflow action refs against latest releases, updates locks; bumps the repo's `VERSION` file for deploys/releases (`project.py`) |
 
