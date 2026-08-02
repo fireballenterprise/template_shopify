@@ -29,11 +29,10 @@ Then in the new repo:
    git push origin main
    ```
 
-2. Update `pyproject.toml` (`name`, `description`, URLs) — `properties.yml` (`repo.local`, `repo.remote`) is created/stamped automatically by `./setup.sh` in step 6
+2. Update `pyproject.toml` (`name`, `description`, URLs) — `properties.yml` (`repo.local`, `repo.remote`) is created/stamped automatically by `./setup.sh` in step 5
 3. Create the `development` branch from `main` (after the graft), make it the **default branch** (`gh repo edit <repo> --default-branch development` — GitHub Actions only lists and `workflow_dispatch`es workflows from the default branch, so workflow changes take effect before merging to `main`), and set branch protection (deletion/force-push guards on `development` + `main`)
 4. Add secrets manually (never via AI): `BOT_PRIVATE_KEY`, `SHOPIFY_CLI_THEME_TOKEN`, `SHOPIFY_FLAG_STORE`, `SHOPIFY_THEME_ID_DEV`, `SHOPIFY_THEME_ID_PRD`; variable: `BOT_APP_ID` (`fireball-actions-bot` is installed org-wide)
-5. Remove the weekly `schedule` trigger from `.github/workflows/dawn_sync.yml` (only the template repo auto-syncs; brand repos sync on demand)
-6. Run `./setup.sh`
+5. Run `./setup.sh`
 
 ## Branches
 
@@ -50,7 +49,7 @@ Thin callers only — logic lives in `fireballenterprise/workflows`, referenced 
 | `deploy.yml` | push to `development`, manual | Bump VERSION build + deploy to dev theme (or prd manually) |
 | `tests.yml` | PR to `development` | actionlint, pylint, ruff, theme-check, yamllint |
 | `release.yml` | manual | Finalize VERSION, promote to `main`, deploy prd, GitHub Release |
-| `dawn_sync.yml` | weekly (template only), manual | Sync `dawn_vanilla` with upstream Dawn |
+| `dawn_sync.yml` | monthly, manual | Sync `dawn_vanilla` with upstream Dawn |
 
 ## Prerequisites
 
