@@ -56,12 +56,6 @@ setup_python_env() {
   echo "INFO: uv Version: $(uv --version)"
 }
 
-configure_properties() {
-  echo -e
-  echo "INFO: Configuring properties.yml for this machine"
-  uv run --no-sync invoke setup.properties
-}
-
 configure_shopify_env() {
   echo -e
   echo "INFO: Shopify CLI Environment Setup"

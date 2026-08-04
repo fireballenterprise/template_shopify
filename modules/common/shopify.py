@@ -1,7 +1,6 @@
 """Shopify store/theme config — not part of the shared template_python repo."""
 
 import os
-import re
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -9,7 +8,6 @@ from typing import Any
 import yaml
 
 from .properties import get_properties, get_repo_root
-from .utils import info
 
 
 def is_ci() -> bool:
@@ -20,35 +18,6 @@ def is_ci() -> bool:
 def _expand_path(value: str) -> Path:
     """Expand ~ and environment variables (e.g. $HOME) in a properties.yml path value."""
     return Path(os.path.expandvars(os.path.expanduser(value)))
-
-
-def ensure_shopify_section() -> None:
-    """Add the `shopify:` section to properties.yml if it's missing.
-
-    `modules/setup/properties.py` now bakes `shopify:` in from creation via
-    `modules/setup/templates/properties/template_shopify.yml` (a tier fragment this repo owns, not
-    touched by `/template` syncing the shared core), so this is a no-op for any `properties.yml`
-    created after that change. Kept as a migration safety net — called as an extra
-    `inv setup.properties` step (after the generic stamping) — for any `properties.yml` created
-    before it, which would otherwise never get the section restored (properties.py doesn't rewrite
-    an existing file). See `shopify.instructions.md`.
-    """
-    props_file = get_repo_root() / "properties.yml"
-    if not props_file.is_file():
-        return
-
-    text = props_file.read_text(encoding="utf-8")
-    if re.search(r"(?m)^shopify:", text):
-        return
-
-    block = 'shopify:\n  local_config: "tmp/.shopify/config.yml"\n\n'
-    match = re.search(r"(?m)^(?:#.*\n)*template:", text)
-    if match:
-        text = text[: match.start()] + block + text[match.start() :]
-    else:
-        text = text.rstrip("\n") + "\n\n" + block.rstrip("\n") + "\n"
-    props_file.write_text(text, encoding="utf-8")
-    info("properties.yml: added shopify.local_config section")
 
 
 def get_shopify_local_config_path() -> Path:
