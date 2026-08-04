@@ -97,7 +97,6 @@ main() {
 
   install_shopify_cli
   setup_python_env
-  configure_properties
   configure_shopify_env
 }
 
