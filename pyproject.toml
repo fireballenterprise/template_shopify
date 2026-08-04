@@ -1,7 +1,7 @@
 [project]
 name = "template-shopify-theme"
 version = "1.0.0"
-description = "Fireball Enterprise Shopify theme template — vendored Dawn, thin caller workflows, Python invoke tasks, reusable modules, and AI Copilot prompts."
+description = "Fireball Enterprise Shopify theme template — content and CI/CD only. Dev tooling lives in fireball_orchestrator."
 readme = "README.md"
 classifiers = [
   "Programming Language :: Python :: 3",
@@ -11,8 +11,6 @@ dependencies = [
     "actionlint-py~=1.7.12.24",
     "invoke~=3.0.3",
     "pylint~=4.0.6",
-    "pytest~=9.1.1",
-    "pytest-cov~=7.1.0",
     "pyyaml~=6.0.3",
     "ruff~=0.16.0",
     "tomlkit~=0.15.1",
@@ -56,10 +54,6 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 docstring-code-format = false
 docstring-code-line-length = "dynamic"
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-norecursedirs = ["tmp", ".venv", ".ruff_cache", "__pycache__"]
 
 [tool.pylint.main]
 py-version = "3.14"
