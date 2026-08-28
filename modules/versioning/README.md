@@ -17,8 +17,10 @@ uv run --no-sync invoke update                    # same as above — top-level 
 uv run --no-sync invoke ver.libs --dry-run        # preview only, never writes
 uv run --no-sync invoke ver.libs --yes            # skip the confirmation prompt
 
-uv run --no-sync invoke ver.project_bump_build        # dev deploy: new minor's first build, or next build number
-uv run --no-sync invoke ver.project_bump_release      # release: drop the build suffix
+uv run --no-sync invoke ver.project_bump_patch        # every merge to development
+uv run --no-sync invoke ver.project_bump_minor        # milestone release
+uv run --no-sync invoke ver.project_bump_major        # major release
+uv run --no-sync invoke ver.project_bump_build        # feature-branch build counter only, never published
 ```
 
 `/update` is the slash command (`.github/prompts/update.prompt.md`) backing the `ver.*` checks
@@ -35,7 +37,7 @@ above.
   the highest published major tag (`git ls-remote`, no API token), and rewrites the pins in place;
   SHAs, branch refs, and full semver pins are left alone
 - `upgrade.py` — install/sync helpers used by `/upgrade`
-- `project.py` — bumps the root `VERSION` file (`Major.Minor.Patch[-Build]`) for development
+- `project.py` — bumps the root `VERSION` file (plain `Major.Minor.Patch`, single source of truth read by `pyproject.toml` via `[tool.setuptools.dynamic]`): `bump_patch` per merge to `development`, `bump_minor`/`bump_major` for a milestone, `bump_build` a feature-branch-only build counter. Its own `get_repo_root()` (`pyproject.toml` + `VERSION`) works in CI. No commit/push/workflow. For development
   builds, and finalizes it for release. Does not commit, push, or trigger any workflow — this repo
   has no `deploy.yml`/`release.yml` of its own. See
   `.github/instructions/versioning.instructions.md` for the full scheme.

@@ -1,6 +1,6 @@
 [project]
 name = "template-shopify-theme"
-version = "1.0.0"
+dynamic = ["version"]  # read from the VERSION file (see [tool.setuptools.dynamic])
 description = "Fireball Enterprise Shopify theme template — content and CI/CD only. Dev tooling lives in fireball_orchestrator."
 readme = "README.md"
 classifiers = [
@@ -17,8 +17,15 @@ dependencies = [
     "yamllint~=1.38.0",
 ]
 
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
 [tool.setuptools]
 packages = []
+
+[tool.setuptools.dynamic]
+version = { file = "VERSION" }
 
 [project.urls]
 homepage = "https://github.com/fireballenterprise/template_shopify"
