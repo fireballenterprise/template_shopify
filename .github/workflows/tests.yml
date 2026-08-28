@@ -2,7 +2,7 @@
 name: Tests
 run-name: "Tests (${{ github.head_ref || github.ref_name }})"
 
-# Thin caller — logic lives in fireballenterprise/workflows_shopify (floating major tag @v2).
+# Thin caller — logic lives in fireballenterprise/workflows_shopify (floating major tag @v3).
 
 on:
   pull_request:
@@ -12,4 +12,4 @@ on:
 
 jobs:
   tests:
-    uses: fireballenterprise/workflows_shopify/.github/workflows/tests.yml@v2
+    uses: fireballenterprise/workflows_shopify/.github/workflows/tests.yml@v3

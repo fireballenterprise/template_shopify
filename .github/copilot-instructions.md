@@ -13,7 +13,7 @@ registered in `tmp/.shopify/config.yml`.
 - `tests.actionlint` / `tests.pylint` / `tests.rufflint` / `tests.theme_check` / `tests.yamllint`
 - `shopify.deploy --env=dev|prd` / `shopify.env`
 - `ver.libs` / `ver.python` / `ver.workflows` / `ver.all` / `ver.update` / `ver.upgrade`
-- `ver.project_bump_build` / `ver.project_bump_release`
+- `ver.project_bump_{patch,minor,major,build}` — VERSION bumps (patch per merge to development)
 
 ## Workflows (`.github/workflows/`)
 Thin callers into `fireballenterprise/workflows_shopify@v2` — no logic lives in this repo's YAML,

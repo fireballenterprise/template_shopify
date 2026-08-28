@@ -51,12 +51,24 @@ def upgrade(_context, yes=False):
 
 
 @task
-def project_bump_build(_context):
-    """Advance VERSION for a dev build (new minor's first build, or next build number)"""
-    project_module.bump_build()
+def project_bump_patch(_context):
+    """X.Y.Z -> X.Y.(Z+1). Every merge to development."""
+    project_module.bump_patch()
 
 
 @task
-def project_bump_release(_context):
-    """Finalize VERSION for release by dropping the build suffix"""
-    project_module.bump_release()
+def project_bump_minor(_context):
+    """X.Y.Z -> X.(Y+1).0. A milestone release bump (release workflow bump=minor)."""
+    project_module.bump_minor()
+
+
+@task
+def project_bump_major(_context):
+    """X.Y.Z -> (X+1).0.0. A major release bump (release workflow bump=major)."""
+    project_module.bump_major()
+
+
+@task
+def project_bump_build(_context):
+    """X.Y.Z -> X.Y.Z-001 -> -002. Manual feature-branch use only; never merged or published."""
+    project_module.bump_build()

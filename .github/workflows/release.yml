@@ -2,10 +2,16 @@
 name: Release
 run-name: "Release"
 
-# Thin caller — logic lives in fireballenterprise/workflows_shopify (floating major tag @v2).
+# Thin caller — logic lives in fireballenterprise/workflows_shopify (floating major tag @v3).
 
 on:
   workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Milestone bump on development before promoting'
+        type: choice
+        default: none
+        options: [none, patch, minor, major]
 
 jobs:
   release:
@@ -13,5 +19,7 @@ jobs:
     # default is read-only — promote pushes main, publish creates the Release
     permissions:
       contents: write
-    uses: fireballenterprise/workflows_shopify/.github/workflows/release.yml@v2
+    uses: fireballenterprise/workflows_shopify/.github/workflows/release.yml@v3
+    with:
+      bump: ${{ inputs.bump }}
     secrets: inherit
