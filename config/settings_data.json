@@ -3,6 +3,7 @@
   "presets": {
     "Dawn": {
       "logo_width": 90,
+      "customer_account_menu": "customer-account-main-menu",
       "color_schemes": {
         "scheme-1": {
           "settings": {
