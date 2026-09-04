@@ -1,0 +1,17 @@
+---
+# Repository Properties
+# Central configuration for all scripts and automation.
+# Created by /setup or ./setup.sh or ./setup.ps1
+
+# This Repository's Local and Remote Paths
+repo:
+  local: "$HOME/Development/fireballenterprise/template_shopify"
+  remote: "github.com/fireballenterprise/template_shopify"
+
+shopify:
+  local_config: "tmp/.shopify/config.yml"
+
+# Repository Template Parent Repository
+template:
+  local: "$HOME/Development/fireballenterprise/template_shopify"
+  remote: "github.com/fireballenterprise/template_shopify"

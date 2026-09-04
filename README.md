@@ -1,6 +1,11 @@
 # Fireball Enterprise Shopify Theme Template
 
-GitHub template repo for Fireball Enterprise Shopify theme repos. Vendored [Shopify Dawn](https://github.com/Shopify/dawn) (seeded at `v15.5.0`) plus just enough Python Invoke tooling to run CI (linting, theme-check, versioning, deploy) and thin caller workflows into [fireballenterprise/workflows_shopify](https://github.com/fireballenterprise/workflows_shopify). All interactive dev tooling (git/PR workflow, Shopify theme pull, Dawn upgrade) and AI planning/instructions live in [fireball_orchestrator](https://github.com/fireballenterprise/fireball_orchestrator) instead — this repo (and repos stamped from it) are content + CI/CD only.
+GitHub template repo for Fireball Enterprise Shopify theme repos. Vendored
+[Shopify Dawn](https://github.com/Shopify/dawn) (seeded at `v15.5.0`) + thin caller workflows into
+[fireballenterprise/workflows_shopify](https://github.com/fireballenterprise/workflows_shopify).
+**Pure content** — no Python, no build tooling. All interactive dev tooling (git/PR workflow,
+theme pull/deploy, Dawn upgrade, version bumps) and AI planning live in
+[fireball_orchestrator](https://github.com/fireballenterprise/fireball_orchestrator).
 
 ## Stamping a New Brand Repo
 
@@ -12,30 +17,30 @@ gh repo create fireballenterprise/fireball_<brand>_shopify \
 
 Then in the new repo:
 
-1. Restore Dawn ancestry — template stamping squashes every branch to a single parentless
+1. **Restore Dawn ancestry** — template stamping squashes every branch to a single parentless
    commit, which breaks the merge-based Dawn flows (`dawn_sync` workflow, `fireball_orchestrator`'s
-   `invoke dawn.upgrade --site=<name>`):
+   `invoke shopify.dawn.upgrade --site=<name>`):
 
    ```sh
    git remote add dawn https://github.com/Shopify/dawn.git
    git fetch dawn main --no-tags
-   # dawn_vanilla = real upstream history (replaces the squashed snapshot)
    git push --force origin refs/remotes/dawn/main:refs/heads/dawn_vanilla
    git fetch origin && git branch -f dawn_vanilla origin/dawn_vanilla
-   # graft the vendored Dawn version into main's ancestry without changing content;
-   # use the tag matching the theme files main currently carries (see config/settings_schema.json)
    git fetch dawn refs/tags/v15.5.0:refs/tags/dawn-v15.5.0 --no-tags
    git checkout main
    git merge dawn-v15.5.0 --allow-unrelated-histories -s ours --no-ff -m "chore: graft Dawn v15.5.0 ancestry into main"
    git push origin main
    ```
 
-2. Update `pyproject.toml` (`name`, `description`, URLs) and `properties.yml` (`repo.local`, `repo.remote`) by hand for the new repo
-3. Delete `.github/workflows/publish_release.yml` — that flow is template-only (no `development` branch/store here to gate a normal release); brand repos release through `release.yml` instead
-4. Create the `development` branch from `main` (after the graft), make it the **default branch** (`gh repo edit <repo> --default-branch development` — GitHub Actions only lists and `workflow_dispatch`es workflows from the default branch, so workflow changes take effect before merging to `main`), and set branch protection (deletion/force-push guards on `development` + `main`)
-5. Add secrets manually (never via AI): `BOT_PRIVATE_KEY`, `SHOPIFY_CLI_THEME_TOKEN`, `SHOPIFY_FLAG_STORE`, `SHOPIFY_THEME_ID_DEV`, `SHOPIFY_THEME_ID_PRD`; variable: `BOT_APP_ID` (`fireball-actions-bot` is installed org-wide)
-6. Run `./setup.sh`
-7. Register the new repo as a site in `fireball_orchestrator`'s `tmp/.shopify/config.yml` (`repo_local_path`, `store`, `theme_id_dev`, `theme_id_prd`, `theme_token`) so its `--site=<name>` dev tooling (`repo.*`, `dawn.*`, `shopify.pull`/`shopify.env`) works
+2. Update `README.md` + `.github/copilot-instructions.md` for the new brand name.
+3. **Delete `.github/workflows/publish_release.yml`** — template-only; brand repos release through `release.yml`.
+4. Create the `development` branch from `main` (after the graft), make it the **default branch**
+   (`gh repo edit <repo> --default-branch development`), and set branch protection on `development` + `main`.
+5. Add secrets manually (never via AI): `BOT_PRIVATE_KEY`, `SHOPIFY_CLI_THEME_TOKEN`,
+   `SHOPIFY_FLAG_STORE`, `SHOPIFY_THEME_ID_DEV`, `SHOPIFY_THEME_ID_PRD`; variable: `BOT_APP_ID`.
+6. Register the new repo as a site in `fireball_orchestrator`'s `tmp/.shopify/config.yml`
+   (`repo_local_path`, `store`, `theme.id_dev`, `theme.id_prd`, `theme.token`) so `--site=<name>`
+   dev tooling works.
 
 ## Branches
 
@@ -45,30 +50,20 @@ Then in the new repo:
 
 ## Workflows
 
-Thin callers only — logic lives in `fireballenterprise/workflows_shopify`, referenced by floating major tag `@v2` (exact tags like `v2.0.0` also exist). `publish_release.yml` is the one exception (see table) — it's template-only, plain YAML, no reusable-workflow call.
+Thin callers into `fireballenterprise/workflows_shopify`, floating major tag `@v4`. All bump /
+deploy / theme-check logic is in that repo's composite actions
+(`actions/{bump_version,deploy_theme,theme_check}`).
 
 | Caller | Trigger | Purpose |
 |--------|---------|---------|
-| `deploy.yml` | push to `development`, manual | Bump VERSION build + deploy to dev theme (or prd manually) |
-| `tests.yml` | PR to `development`/`main` | actionlint, pylint, ruff, theme-check, yamllint |
-| `release.yml` | manual | Finalize VERSION, promote to `main`, deploy prd, GitHub Release |
-| `dawn_sync.yml` | monthly, manual | Sync `dawn_vanilla` with upstream Dawn |
-| `publish_release.yml` | push to `main` (VERSION change), manual | **Template repo only** — tags + publishes a GitHub Release straight off `main`, since this repo has no `development` branch/store to run the normal `release.yml` flow. Delete this file in brand repos stamped from the template. |
-
-## Prerequisites
-
-- [Python](https://www.python.org/) `>=3.14`
-- [uv](https://docs.astral.sh/uv/) (dependency/environment management)
-- [Shopify CLI](https://shopify.dev/docs/storefronts/themes/tools/cli) (`npm install -g @shopify/cli`)
-
-## Setup
-
-```sh
-./setup.sh
-```
-
-Creates a `.venv` with `uv`, installs dependencies, and installs the Shopify CLI. `properties.yml` is committed directly (no per-machine stamping) — edit it by hand if `repo.local`/`repo.remote` need to change.
+| `tests.yml` | PR → `development` / `main` | theme-check + yamllint + actionlint |
+| `deploy.yml` | push → `development`, manual | bump `VERSION` patch + deploy dev theme (or prd manually) |
+| `release.yml` | manual | optional milestone bump, promote → `main`, deploy prd, GitHub Release |
+| `dawn_sync.yml` | monthly, manual | sync `dawn_vanilla` with upstream Dawn |
+| `publish_release.yml` | push → `main` (VERSION change), manual | **Template repo only** — tags + publishes a Release off `main` (this repo has no `development` branch/store for the normal flow). Delete it in a stamped brand repo. |
 
 ## Versioning
 
-`major.minor.patch-build` in development (e.g. `1.2.0-004`), finalized to `major.minor.patch` on release. NO `v` prefix on release tags. The home page carries the current version as an HTML comment via `snippets/fireball-version.liquid`.
+Plain `Major.Minor.Patch` on both `development` and `main` — patch bumped per merge to
+`development` (by `deploy.yml`), promote-as-is on release. No `v` prefix on release tags. The home
+page carries the current version via `snippets/fireball-version.liquid`.
