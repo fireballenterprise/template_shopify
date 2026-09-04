@@ -2,7 +2,7 @@
 name: Release
 run-name: "Release"
 
-# Thin caller — logic lives in fireballenterprise/workflows_shopify (floating major tag @v3).
+# Thin caller — logic lives in fireballenterprise/workflows_shopify (floating major tag @v4).
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ jobs:
     # default is read-only — promote pushes main, publish creates the Release
     permissions:
       contents: write
-    uses: fireballenterprise/workflows_shopify/.github/workflows/release.yml@v3
+    uses: fireballenterprise/workflows_shopify/.github/workflows/release.yml@v4
     with:
       bump: ${{ inputs.bump }}
     secrets: inherit

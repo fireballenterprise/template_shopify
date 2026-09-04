@@ -1,79 +1,40 @@
-# Basics
+# Editors
 *#
-*.un~
 *~
 .#*
 .*.sw[a-z]
-/.yardoc
-/_yardoc/
-/coverage/
-/pkg/
-/spec/reports/
 \#*#
-pkg/
-**/tmp/**
-**/wip/**
-**/vendor/**
-**/.bin/**
-**/.vendor/**
-**/.bundle/**
 
-# Machine-specific config (local repo/template paths) — copy properties.yml.example to get started
-/properties.yml
-
-# Linux
+# OS
 **/.directory
 **/.Trash-*
-
-# Mac OS
 **/.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 **/.localized
-
-# Python
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-**/__pycache__/**
-**/*.pyc
-**/.ruff_cache/**
-**/.pytest_cache/**
-
-# Virtual environments
-**/.venv/**
-.venv/
-venv/
-ENV/
-env/
 
 # VSCode
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
 
-# Windows
-ehthumbs.db
-Thumbs.db
-
-# Mac OS (upstream Dawn)
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-
-# Shopify
+# Shopify / Node
 .shopify
 node_modules
 *.zip
+
+# Working dirs
+**/tmp/**
+**/wip/**
+
+# Stray Python cruft (no Python tooling lives here any more)
+**/__pycache__/**
+**/*.py[cod]
+*.egg-info/
+.venv/
+.ruff_cache/
+.pytest_cache/
